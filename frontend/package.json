@@ -1,0 +1,42 @@
+{
+  "name": "gse-tracker-frontend",
+  "version": "1.0.0",
+  "description": "Ghana Stock Exchange Portfolio Tracker with AI chatbot",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "test:unit": "vitest",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.2.1",
+    "axios": "^1.6.7",
+    "chart.js": "^4.4.1",
+    "date-fns": "^3.3.1",
+    "marked": "^11.1.1",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21",
+    "vue-chartjs": "^5.3.0",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^8.56.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/test-utils": "^2.4.5",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^9.22.0",
+    "globals": "^15.0.0",
+    "postcss": "^8.4.35",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^3.4.3",
+    "typescript": "~5.4.5",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0",
+    "vue-tsc": "^3.2.5"
+  }
+}

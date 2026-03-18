@@ -1,0 +1,155 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+"mcp": {
+     "github": {
+       "type": "local",
+       "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+       "enabled": true,
+       "environment": {
+         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN_HERE"
+       }
+     }
+   },
+  "agent": {
+    "orchestrator": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "primary",
+      "temperature": 0.2,
+      "description": "Coordinates project workflow. Delegates to specialized subagents like task-planner, ai-architect, backend-dev, frontend-dev, and others."
+    },
+
+    "task-planner": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "description": "Breaks large tasks into structured, step-by-step plans before implementation begins."
+    },
+
+    "ai-architect": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Designs AI system architecture and self-hosted AI stacks."
+    },
+
+    "backend-dev": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.3,
+      "description": "Handles backend services, database architecture, and backend performance optimization."
+    },
+
+    "frontend-dev": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.3,
+      "description": "Builds frontend applications and UI components."
+    },
+
+    "rag-engineer": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Manages RAG pipelines, optimization, and vector database tuning."
+    },
+
+    "prompt-engineer": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Designs prompts, guardrails, and LLM optimization strategies."
+    },
+
+    "ml-engineer": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Builds and evaluates machine learning pipelines."
+    },
+
+    "data-engineer": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Handles data pipelines, cleaning, and validation."
+    },
+
+    "devops": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Manages deployment, CI/CD pipelines, containerization, and infrastructure monitoring."
+    },
+
+    "tester": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Runs automated and manual tests, writes test cases and coverage reports."
+    },
+
+    "reviewer": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "description": "Reviews code for quality, security vulnerabilities, and best practices.",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+
+    "debugger": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "description": "Debugs runtime issues, traces errors, and proposes fixes."
+    },
+
+    "docs-writer": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "description": "Generates and maintains project documentation.",
+      "tools": {
+        "bash": false
+      }
+    },
+
+    "pr-generator": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "description": "Generates pull request descriptions, changelogs, and commit summaries."
+    },
+
+    "evaluator": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "description": "Evaluates outputs for correctness, completeness, and quality."
+    },
+
+    "hallucination-detector": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0,
+      "description": "Detects factual inconsistencies, hallucinations, and unsupported claims in generated content."
+    },
+
+    "cost-optimizer": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "description": "Analyzes and optimizes token usage, prompt efficiency, and inference costs."
+    },
+
+    "github-publisher": {
+      "model": "quantum/qwen3-coder-next",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "description": "Creates a new GitHub repository, generates a professional README and documentation, writes a structured commit message, and pushes the entire project. Invoke when the user wants to publish a local project to GitHub for the first time.",
+      "prompt": "{file:./prompts/github-publisher.txt}"
+    }
+  }
+}
