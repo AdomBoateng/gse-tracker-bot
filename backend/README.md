@@ -1,6 +1,6 @@
-# GSE Portfolio Tracker - Backend
+# GSE Tracker - Backend
 
-This is the backend API service for the Ghana Stock Exchange Portfolio Tracker.
+This is the backend API service for the Ghana Stock Exchange Tracker.
 
 ## Quick Start
 
@@ -32,12 +32,6 @@ ruff check . && ruff format .
 - `GET /api/v1/gse/live/{symbol}` - Live price for stock
 - `GET /api/v1/gse/equities` - All equities
 - `GET /api/v1/gse/equities/{symbol}` - Stock details
-- `GET /api/v1/portfolio/holdings` - Get all holdings
-- `POST /api/v1/portfolio/holdings` - Add holding
-- `PUT /api/v1/portfolio/holdings/{id}` - Update holding
-- `DELETE /api/v1/portfolio/holdings/{id}` - Delete holding
-- `GET /api/v1/portfolio/stats` - Portfolio statistics
-- `POST /api/v1/ai/chat` - AI chat with portfolio insights
 
 ## Configuration
 
@@ -47,12 +41,11 @@ Copy `.env.example` to `.env` and configure:
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=phi-3-mini
 GSE_API_URL=https://dev.kwayisi.org/apis/gse
-DATABASE_URL=sqlite:///./gse_tracker.db
 DEBUG=true
 PORT=8000
 ```
 
-Relative SQLite paths are resolved from the `backend` directory.
+The `OLLAMA_*` settings are reserved for a planned AI-insights feature and are not currently used by any endpoint.
 
 ## Project Structure
 
@@ -61,9 +54,8 @@ backend/
 ├── app/
 │   ├── api/       # API routes
 │   ├── core/      # Configuration
-│   ├── models/    # Pydantic & SQLAlchemy models
-│   ├── services/  # Business logic
-│   └── db/        # Database layer
+│   ├── models/    # Pydantic models
+│   └── services/  # Business logic (GSE API client + caching)
 ├── tests/         # Test suite
 └── main.py        # FastAPI app
 ```

@@ -37,7 +37,6 @@ An informative web application providing real-time Ghana Stock Exchange (GSE) ma
 
 ### Frontend
 - **Framework**: Vue 3 + TypeScript
-- **State Management**: Pinia
 - **Routing**: Vue Router
 - **Styling**: Tailwind CSS
 - **HTTP Client**: Axios
@@ -51,13 +50,10 @@ gse-tracker/
 │   │   ├── api/          # API endpoints
 │   │   │   ├── v1/
 │   │   │   │   └── stocks.py
-│   │   ├── core/         # Configuration, logging
+│   │   ├── core/         # Configuration
 │   │   ├── models/       # Pydantic models
-│   │   ├── services/     # Business logic
-│   │   │   └── gse_service.py
-│   │   └── db/           # Database layer
-│   │       ├── session.py
-│   │       └── crud.py
+│   │   └── services/     # Business logic
+│   │       └── gse_service.py
 │   ├── tests/            # Test suite
 │   ├── requirements.txt
 │   └── main.py
@@ -65,10 +61,7 @@ gse-tracker/
 │   ├── src/
 │   │   ├── views/        # Page components
 │   │   │   └── Dashboard.vue
-│   │   ├── components/
-│   │   ├── stores/
-│   │   ├── services/
-│   │   ├── assets/
+│   │   ├── App.vue
 │   │   └── main.ts
 │   ├── tests/
 │   ├── index.html
@@ -77,8 +70,6 @@ gse-tracker/
 │   └── vite.config.ts
 ├── .env.example
 ├── .gitignore
-├── deploy.sh
-├── docker-compose.yml
 ├── AGENTS.md
 └── README.md
 ```
@@ -140,11 +131,6 @@ pytest tests/ -v
 cd frontend
 npm run test:unit
 
-# Load testing
-cd backend
-npm install -g artillery
-artillery run ../load-test.yml
-
 # Linting
 cd backend
 ruff check .
@@ -187,69 +173,17 @@ npm run build
 npm run preview
 ```
 
-## 🐳 Docker (Optional)
+## 🚀 Deployment
 
-### Quick Deploy with Docker Compose
-
-```bash
-# Build and start
-docker-compose up -d --build
-
-# View logs
-docker-compose logs -f
-
-# Stop
-docker-compose down
-
-# Stop and remove volumes
-docker-compose down -v
-```
-
-### Manual Docker Deployment
+No Docker or production deployment configuration exists in this repo yet (no `Dockerfile`, `docker-compose.yml`, or `deploy.sh`). For now, run in production with Gunicorn directly:
 
 ```bash
-# Build images
-docker-compose build
-
-# Start services
-docker-compose up -d
-```
-
-## 🚀 Production Deployment
-
-For production-ready deployment with high concurrency support:
-
-```bash
-# Using the deployment script
-chmod +x deploy.sh
-./deploy.sh backend/.env.production
-
-# Or manual deployment
 cd backend
 pip install gunicorn
 gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000 app.main:app
 ```
 
-### Production Configuration
-
-Copy `.env.production` to `backend/.env` and update:
-
-```env
-DEBUG=false
-CORS_ORIGINS=["http://localhost:5173","https://yourdomain.com"]
-GUNICORN_WORKERS=4
-GUNICORN_TIMEOUT=120
-```
-
-### High Availability Setup
-
-The application is configured to handle:
-- **Concurrent Users**: 1000+ with 4 workers
-- **Response Time**: <200ms average
-- **Auto-recovery**: Docker restart policies
-- **Health Checks**: Built-in monitoring endpoint
-
-See [PRODUCTION.md](PRODUCTION.md) for complete deployment guide.
+Set `DEBUG=false` and update `CORS_ORIGINS` to your real domain in `backend/.env` before deploying. Containerization and a documented deployment process are TBD and will be addressed separately when a hosting target is chosen.
 
 ## 📚 Configuration
 
@@ -261,8 +195,6 @@ OLLAMA_TEMPERATURE=0.3
 
 GSE_API_URL=https://dev.kwayisi.org/apis/gse
 
-DATABASE_URL=sqlite:///./backend/gse_tracker.db
-
 DEBUG=true
 PORT=8000
 
@@ -272,29 +204,18 @@ GUNICORN_WORKERS=4
 GUNICORN_TIMEOUT=120
 ```
 
+`OLLAMA_*` settings are reserved for a planned AI-insights feature and are not used by any endpoint yet.
+
 ### Frontend
 Edit `frontend/vite.config.ts` to configure proxy and other settings.
 
 ## ⚡ Performance
 
-### Current Optimizations
 - **Async/Await**: All API endpoints use async/await with httpx.AsyncClient
-- **Database Pooling**: 20 connections with 10 overflow support
-- **Caching**: 5-minute TTL cache for live data
+- **Caching**: 5-minute in-memory cache for live market data, shared across requests
 - **Worker System**: Gunicorn with multiple Uvicorn workers
 
-### Concurrency Support
-- **100 users**: <50ms response time
-- **500 users**: <100ms response time
-- **1000 users**: <200ms response time
-- **5000 users**: <500ms response time (with 8+ workers)
-
-### Scaling
-- Increase Gunicorn workers: `-w <number>`
-- Adjust Docker resources in `docker-compose.yml`
-- Use connection pooling for database
-
-See [LOAD_TESTING.md](LOAD_TESTING.md) for performance testing guide.
+No load testing has been performed against this app yet — treat any concurrency numbers you see elsewhere in this repo's history as aspirational, not measured.
 
 ## 🤝 Contributing
 
@@ -311,5 +232,5 @@ MIT License - see LICENSE file for details.
 ## 🙏 Acknowledgments
 
 - GSE API by [kwayisi.org](https://dev.kwayisi.org/apis/gse/)
-- Powered by FastAPI, Vue.js, and Ollama
+- Powered by FastAPI and Vue.js
 - Built for Ghana Stock Exchange investors
