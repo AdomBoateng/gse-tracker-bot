@@ -49,6 +49,11 @@ logs/
 frontend/dist/
 frontend/node_modules/
 
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
+frontend/blob-report/
+
 # Docker
 docker-compose.override.yml
 

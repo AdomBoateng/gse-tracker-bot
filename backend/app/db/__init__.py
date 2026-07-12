@@ -1,1 +1,1 @@
-"""Database module initialization"""
+"""Database module - daily snapshot storage for historical charts"""

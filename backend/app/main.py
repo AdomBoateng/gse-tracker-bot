@@ -1,8 +1,10 @@
-from app.api.v1 import stocks
+from app.api.v1 import stocks, history, fx
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.db.session import Base, engine
+from app.models import snapshot_model  # noqa: F401 - registers DailySnapshot with Base
 
 app = FastAPI(
     title=settings.app_name,
@@ -20,12 +22,14 @@ app.add_middleware(
 )
 
 app.include_router(stocks.router)
+app.include_router(history.router)
+app.include_router(fx.router)
 
 
 @app.on_event("startup")
 async def startup():
-    """Initialize database on startup (if needed)"""
-    pass
+    """Create the snapshot database tables if they don't exist yet"""
+    Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")

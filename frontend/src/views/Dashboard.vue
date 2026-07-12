@@ -1,786 +1,301 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <h1
-      class="text-4xl md:text-5xl font-bold text-center mb-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent"
-    >
-      GHANA STOCK EXCHANGE
-    </h1>
-    <p class="text-center text-gray-600 mb-8">
-      Real-time market data, top performers, and comprehensive stock information
-    </p>
-
+  <div class="px-4 sm:px-6 py-6 max-w-[1360px] mx-auto">
     <div v-if="loading" class="space-y-6 animate-fadeIn">
-      <div
-        class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8 h-64 animate-pulse"
-      >
-        <div class="h-6 bg-gray-200 rounded w-1/3 mb-6"></div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="h-32 bg-gray-200 rounded-xl"></div>
-          <div class="h-32 bg-gray-200 rounded-xl"></div>
-        </div>
-      </div>
-      <div
-        class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8 h-64 animate-pulse"
-      ></div>
-      <div
-        class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8 h-96 animate-pulse"
-      ></div>
+      <div class="border-2 border-divider h-48"></div>
+      <div class="border-2 border-divider h-32"></div>
+      <div class="border-2 border-divider h-96"></div>
     </div>
 
     <div v-else>
-      <!-- Market Status Section -->
-      <div class="max-w-6xl mx-auto mb-8">
-        <div
-          class="bg-gradient-to-br rounded-2xl p-8 text-white shadow-2xl overflow-hidden relative"
-          :class="
-            marketOpen
-              ? 'from-emerald-500 via-green-600 to-teal-600'
-              : 'from-slate-800 via-gray-900 to-black'
-          "
-        >
-          <div class="absolute top-0 right-0 p-8 opacity-10">
-            <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"
-              />
-            </svg>
-          </div>
-          <div
-            class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6"
-          >
-            <div>
-              <div class="flex items-center gap-3 mb-2">
-                <span class="text-3xl">{{ marketOpen ? "☀️" : "🌙" }}</span>
-                <h2 class="text-3xl font-bold">
-                  {{ marketOpen ? "MARKET IS OPEN" : "MARKET IS CLOSED" }}
-                </h2>
-              </div>
-              <p class="text-lg opacity-90">
-                {{
-                  marketOpen
-                    ? `Trading ends in ${timeRemaining}`
-                    : `Opens in ${timeToOpen}`
-                }}
-              </p>
-              <p class="text-sm opacity-75 mt-2">
-                Market Hours: 10:00 AM - 3:00 PM GMT
-                <br />
-                <span class="text-xs opacity-60"
-                  >Current Mode:
-                  {{
-                    isNextDayMode
-                      ? "Previous Day Data (12:00 AM - 10:00 AM GMT)"
-                      : "Today's Live Data (10:00 AM - 11:59 PM GMT)"
-                  }}</span
-                >
-              </p>
-            </div>
-            <!-- <div class="flex gap-4">
-              <div
-                v-if="gseIndex"
-                class="text-center px-6 py-4 bg-white/20 backdrop-blur-sm rounded-xl"
-              >
-                <p class="text-sm opacity-75">GSE Index</p>
-                <p class="text-2xl font-bold">
-                  {{ gseIndex.index.toFixed(2) }}
-                </p>
-                <p
-                  class="text-sm"
-                  :class="
-                    gseIndex.change === 0
-                      ? 'text-gray-300'
-                      : gseIndex.change > 0
-                        ? 'text-emerald-300'
-                        : 'text-rose-300'
-                  "
-                >
-                  {{
-                    gseIndex.change === 0 ? "" : gseIndex.change > 0 ? "+" : ""
-                  }}{{ gseIndex.change.toFixed(2) }} ({{
-                    gseIndex.percentChange.toFixed(2)
-                  }}%)
-                </p>
-              </div>
-              <div
-                class="text-center px-6 py-4 bg-white/20 backdrop-blur-sm rounded-xl min-w-[120px]"
-              >
-                <p class="text-sm opacity-75">Total Companies</p>
-                <p class="text-2xl font-bold">{{ liveData.length }}</p>
-              </div>
-              <div
-                class="text-center px-6 py-4 bg-white/20 backdrop-blur-sm rounded-xl min-w-[120px]"
-              >
-                <p class="text-sm opacity-75">Total Volume</p>
-                <p class="text-2xl font-bold">
-                  {{ totalVolume.toLocaleString() }}
-                </p>
-              </div>
-            </div> -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Today's Market Stats (Active Day Only) -->
-      <div v-if="marketOpen" class="max-w-6xl mx-auto mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Total Stocks -->
-          <div
-            class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 shadow-xl text-white"
-          >
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center"
-              >
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M4 4h16v2H4V4zm0 6h16v2H4v-2zm0 6h16v2H4v-2z" />
-                </svg>
-              </div>
-              <h3 class="text-lg font-bold">Total Stocks</h3>
-            </div>
-            <p class="text-4xl font-bold">{{ liveData.length }}</p>
-            <p class="text-sm opacity-75 mt-1">Active listed companies</p>
-          </div>
-          <!-- Total Volume -->
-          <div
-            class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 shadow-xl text-white"
-          >
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center"
-              >
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path
-                    d="M13 13h8V7h-8v6zm-2 6h2v-6h-2v6zm-6-6h2v-6H5v6zm6 0h2v-6h-2v6zm6 0h2v-6h-2v6zM1 17h2v-6H1v6zm6 0h2v-6H7v6z"
-                  />
-                </svg>
-              </div>
-              <h3 class="text-lg font-bold">Current Total Volume Traded</h3>
-            </div>
-            <p class="text-4xl font-bold">{{ totalVolume.toLocaleString() }}</p>
-            <p class="text-sm opacity-75 mt-1">Shares</p>
-          </div>
-          <!-- GSE Index -->
-          <div
-            v-if="gseIndex"
-            class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 shadow-xl text-white"
-          >
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center"
-              >
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path
-                    d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"
-                  />
-                </svg>
-              </div>
-              <h3 class="text-lg font-bold">Current GSE Index</h3>
-            </div>
-            <p class="text-4xl font-bold">{{ gseIndex.index.toFixed(2) }}</p>
-            <p
-              class="text-sm mt-1"
-              :class="
-                gseIndex.change === 0
-                  ? 'opacity-75'
-                  : gseIndex.change > 0
-                    ? 'text-emerald-300'
-                    : 'text-rose-300'
-              "
-            >
-              {{ gseIndex.change === 0 ? "" : gseIndex.change > 0 ? "+" : ""
-              }}{{ gseIndex.change.toFixed(2) }} ({{
-                gseIndex.percentChange.toFixed(2)
-              }}%)
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Today's Top Gainers Section -->
-      <div class="max-w-6xl mx-auto mb-8">
-        <div
-          class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/20"
-        >
-          <div
-            class="bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 px-6 py-4"
-          >
-            <h2 class="text-2xl font-bold text-white flex items-center gap-3">
-              <span>📈</span>
-              {{ isNextDayMode ? "Previous Day's" : "Today's" }} Top Gainers
-              <span class="text-sm font-normal opacity-75 ml-2"
-                >({{ dateDisplay }})</span
-              >
-            </h2>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div
-                v-for="stock in gainers"
-                :key="stock.name"
-                class="group relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-emerald-100 hover:border-emerald-400 cursor-pointer"
-              >
-                <div class="absolute top-4 right-4">
-                  <img
-                    v-if="stock.logo_url"
-                    :src="stock.logo_url"
-                    alt="Logo"
-                    class="w-16 h-16 rounded-xl object-contain shadow-inner bg-white p-1"
-                  />
-                  <div
-                    v-else
-                    class="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center text-3xl font-bold text-emerald-700 shadow-inner"
-                  >
-                    {{ stock.name.charAt(0) }}
-                  </div>
-                </div>
-                <div class="mt-14 space-y-3">
-                  <div class="flex items-center justify-between">
-                    <h3
-                      class="font-bold text-xl text-gray-800 group-hover:text-emerald-600 transition-colors"
-                    >
-                      {{ stock.name }}
-                    </h3>
-                    <span
-                      class="px-3 py-1 bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700 text-xs rounded-full font-bold shadow-sm"
-                      >{{ stock.symbol }}</span
-                    >
-                  </div>
-                  <p
-                    class="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent"
-                  >
-                    ₵{{ stock.price.toFixed(2) }}
-                  </p>
-                  <div class="flex items-center gap-3">
-                    <span
-                      class="font-bold text-lg"
-                      :class="
-                        stock.change === 0
-                          ? 'text-gray-500'
-                          : stock.change > 0
-                            ? 'text-emerald-600'
-                            : 'text-rose-600'
-                      "
-                      >{{
-                        stock.change > 0 ? "⬆️" : stock.change < 0 ? "⬇️" : "➖"
-                      }}
-                      {{ stock.change.toFixed(2) }}</span
-                    >
-                    <span
-                      class="opacity-75 text-sm"
-                      :class="
-                        stock.change === 0
-                          ? 'text-gray-500'
-                          : stock.change > 0
-                            ? 'text-emerald-600'
-                            : 'text-rose-600'
-                      "
-                      >({{
-                        ((stock.change / stock.price) * 100).toFixed(2)
-                      }}%)</span
-                    >
-                  </div>
-                  <div class="pt-4 border-t-2 border-emerald-100">
-                    <p
-                      class="text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold"
-                    >
-                      Volume Traded
-                    </p>
-                    <p class="font-bold text-gray-700 text-lg">
-                      {{ stock.volume.toLocaleString() }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Today's Top Losers Section -->
-      <div class="max-w-6xl mx-auto mb-8">
-        <div
-          class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/20"
-        >
-          <div
-            class="bg-gradient-to-r from-rose-500 via-red-500 to-rose-600 px-6 py-4"
-          >
-            <h2 class="text-2xl font-bold text-white flex items-center gap-3">
-              <span>📉</span>
-              {{ isNextDayMode ? "Previous Day's" : "Today's" }} Top Losers
-              <span class="text-sm font-normal opacity-75 ml-2"
-                >({{ dateDisplay }})</span
-              >
-            </h2>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div
-                v-for="stock in losers"
-                :key="stock.name"
-                class="group relative bg-gradient-to-br from-white via-rose-50/30 to-white rounded-xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-rose-100 hover:border-rose-400 cursor-pointer"
-              >
-                <div class="absolute top-4 right-4">
-                  <img
-                    v-if="stock.logo_url"
-                    :src="stock.logo_url"
-                    alt="Logo"
-                    class="w-16 h-16 rounded-xl object-contain shadow-inner bg-white p-1"
-                  />
-                  <div
-                    v-else
-                    class="w-16 h-16 rounded-xl bg-gradient-to-br from-rose-100 to-rose-200 flex items-center justify-center text-3xl font-bold text-rose-700 shadow-inner"
-                  >
-                    {{ stock.name.charAt(0) }}
-                  </div>
-                </div>
-                <div class="mt-14 space-y-3">
-                  <div class="flex items-center justify-between">
-                    <h3
-                      class="font-bold text-xl text-gray-800 group-hover:text-rose-600 transition-colors"
-                    >
-                      {{ stock.name }}
-                    </h3>
-                    <span
-                      class="px-3 py-1 bg-gradient-to-r from-rose-100 to-rose-200 text-rose-700 text-xs rounded-full font-bold shadow-sm"
-                      >{{ stock.symbol }}</span
-                    >
-                  </div>
-                  <p
-                    class="text-3xl font-bold bg-gradient-to-r from-rose-600 to-red-600 bg-clip-text text-transparent"
-                  >
-                    ₵{{ stock.price.toFixed(2) }}
-                  </p>
-                  <div class="flex items-center gap-3">
-                    <span
-                      class="font-bold text-lg"
-                      :class="
-                        stock.change === 0
-                          ? 'text-gray-500'
-                          : stock.change > 0
-                            ? 'text-rose-600'
-                            : 'text-rose-600'
-                      "
-                      >{{
-                        stock.change > 0 ? "⬆️" : stock.change < 0 ? "⬇️" : "➖"
-                      }}
-                      {{ stock.change.toFixed(2) }}</span
-                    >
-                    <span
-                      class="opacity-75 text-sm"
-                      :class="
-                        stock.change === 0
-                          ? 'text-gray-500'
-                          : stock.change > 0
-                            ? 'text-rose-600'
-                            : 'text-rose-600'
-                      "
-                      >({{
-                        ((Math.abs(stock.change) / stock.price) * 100).toFixed(
-                          2,
-                        )
-                      }}%)</span
-                    >
-                  </div>
-                  <div class="pt-4 border-t-2 border-rose-100">
-                    <p
-                      class="text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold"
-                    >
-                      Volume Traded
-                    </p>
-                    <p class="font-bold text-gray-700 text-lg">
-                      {{ stock.volume.toLocaleString() }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- All Companies Section -->
-      <div class="max-w-6xl mx-auto mb-8">
-        <div
-          class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/20"
-        >
-          <div
-            class="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-700 px-6 py-5"
-          >
-            <div class="flex items-center justify-between flex-wrap gap-4">
-              <h2 class="text-2xl font-bold text-white flex items-center gap-3">
-                <span>📋</span> All Companies
-              </h2>
-              <div class="flex gap-2 items-center">
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Search stocks..."
-                  class="px-4 py-2 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40"
-                />
-                <button
-                  @click="sortBy = sortBy === 'name' ? '-name' : 'name'"
-                  class="px-3 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors text-white"
-                >
-                  Sort: {{ sortBy.startsWith("-") ? "↓" : "↑" }}
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                <tr>
-                  <th
-                    class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider"
-                  >
-                    Company
-                  </th>
-                  <th
-                    class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider"
-                  >
-                    Logo
-                  </th>
-                  <th
-                    class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider"
-                  >
-                    Volume
-                  </th>
-                  <th
-                    class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider"
-                  >
-                    Price
-                  </th>
-                  <th
-                    class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider"
-                  >
-                    Change
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200">
-                <tr
-                  v-for="stock in paginatedStocks"
-                  :key="stock.symbol ?? stock.name"
-                  class="hover:bg-blue-50/30 transition-colors duration-200"
-                >
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-4">
-                      <div
-                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-violet-100 flex items-center justify-center text-2xl font-bold text-blue-600 shadow-sm"
-                      >
-                        {{ stock.name.charAt(0) }}
-                      </div>
-                      <div>
-                        <p class="font-semibold text-gray-900">
-                          {{ stock.name }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                          {{ stock.company_name }}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <img
-                      v-if="stock.logo_url"
-                      :src="stock.logo_url"
-                      alt="Logo"
-                      class="w-12 h-12 mx-auto rounded-lg object-contain shadow-sm bg-white p-1"
-                    />
-                    <div
-                      v-else
-                      class="w-12 h-12 mx-auto rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-sm font-bold text-gray-600 shadow-sm"
-                    >
-                      {{ stock.symbol ? stock.symbol.charAt(0) : "?" }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right">
-                    <p class="font-medium text-gray-600">
-                      {{ stock.volume.toLocaleString() }}
-                    </p>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right">
-                    <p class="font-bold text-gray-900">
-                      ₵{{ stock.price.toFixed(2) }}
-                    </p>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right">
-                    <span
-                      class="font-bold px-4 py-1.5 rounded-lg"
-                      :class="getChangeColorClass(stock.change)"
-                    >
-                      {{ stock.change > 0 ? "+" : ""
-                      }}{{ stock.change.toFixed(2) }} ({{
-                        Math.abs((stock.change / stock.price) * 100).toFixed(2)
-                      }}%)
-                    </span>
-                  </td>
-                </tr>
-                <tr v-if="paginatedStocks.length === 0">
-                  <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                    No stocks found matching your search
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div
-            class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4"
-          >
-            <p class="text-sm text-gray-600">
-              Showing
-              {{
-                paginatedStocks.length > 0
-                  ? (currentPage - 1) * itemsPerPage + 1
-                  : 0
-              }}
-              -
-              {{ Math.min(currentPage * itemsPerPage, sortedStocks.length) }} of
-              {{ sortedStocks.length }} companies
-            </p>
-            <div class="flex gap-2">
-              <button
-                @click="currentPage = Math.max(1, currentPage - 1)"
-                :disabled="currentPage === 1"
-                class="px-3 py-1 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-medium transition-colors"
-              >
-                Previous
-              </button>
-              <span class="px-3 py-1 text-gray-700 font-medium"
-                >Page {{ currentPage }} of {{ totalPages }}</span
-              >
-              <button
-                @click="currentPage = Math.min(totalPages, currentPage + 1)"
-                :disabled="currentPage === totalPages"
-                class="px-3 py-1 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-medium transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Market Summary Section -->
-      <div v-if="!marketOpen" class="max-w-6xl mx-auto mb-8">
-        <div
-          class="bg-gradient-to-br rounded-2xl p-8 text-white shadow-2xl overflow-hidden relative"
-          :class="'from-slate-800 via-gray-900 to-black'"
-        >
-          <div class="absolute top-0 right-0 p-8 opacity-10">
-            <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"
-              />
-            </svg>
-          </div>
-          <div class="relative z-10">
-            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
-              <span>📊</span> Market Summary - {{ dateDisplay }}
-            </h2>
-
-            <!-- Summary Statistics Table -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div
-                v-if="gainers.length > 0"
-                class="bg-emerald-500/20 backdrop-blur-sm rounded-xl p-4 border border-emerald-500/30"
-              >
-                <h4 class="font-semibold text-emerald-300 mb-3">Top Gainers</h4>
-                <div class="space-y-2">
-                  <div
-                    v-for="stock in gainers.slice(0, 5)"
-                    :key="stock.name"
-                    class="flex justify-between items-center py-2 border-b border-emerald-600/30 last:border-0"
-                  >
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="w-5 h-5 rounded-full bg-emerald-600/50 text-emerald-100 flex items-center justify-center text-xs font-bold"
-                        >{{ gainers.indexOf(stock) + 1 }}</span
-                      >
-                      <span class="font-medium text-emerald-100 text-sm">{{
-                        stock.name
-                      }}</span>
-                    </div>
-                    <div class="text-right">
-                      <span class="block text-emerald-50 text-sm"
-                        >₵{{ stock.price.toFixed(2) }}</span
-                      >
-                      <span class="block text-xs text-emerald-300 font-medium"
-                        >{{ stock.change > 0 ? "+" : ""
-                        }}{{ stock.change.toFixed(2) }} ({{
-                          ((stock.change / stock.price) * 100).toFixed(2)
-                        }}%)</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                v-if="losers.length > 0"
-                class="bg-rose-500/20 backdrop-blur-sm rounded-xl p-4 border border-rose-500/30"
-              >
-                <h4 class="font-semibold text-rose-300 mb-3">Top Losers</h4>
-                <div class="space-y-2">
-                  <div
-                    v-for="stock in losers.slice(0, 5)"
-                    :key="stock.name"
-                    class="flex justify-between items-center py-2 border-b border-rose-600/30 last:border-0"
-                  >
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="w-5 h-5 rounded-full bg-rose-600/50 text-rose-100 flex items-center justify-center text-xs font-bold"
-                        >{{ losers.indexOf(stock) + 1 }}</span
-                      >
-                      <span class="font-medium text-rose-100 text-sm">{{
-                        stock.name
-                      }}</span>
-                    </div>
-                    <div class="text-right">
-                      <span class="block text-rose-50 text-sm"
-                        >₵{{ stock.price.toFixed(2) }}</span
-                      >
-                      <span class="block text-xs text-rose-300 font-medium"
-                        >{{ stock.change.toFixed(2) }} ({{
-                          (
-                            (Math.abs(stock.change) / stock.price) *
-                            100
-                          ).toFixed(2)
-                        }}%)</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="bg-blue-500/20 backdrop-blur-sm rounded-xl p-4 border border-blue-500/30"
-              >
-                <h4 class="font-semibold text-blue-300 mb-3">Market Stats</h4>
-                <div class="space-y-2">
-                  <div
-                    class="flex justify-between items-center py-2 border-b border-blue-600/30 last:border-0"
-                  >
-                    <span class="font-medium text-blue-100 text-sm"
-                      >Total Listed Companies</span
-                    >
-                    <span class="font-semibold text-blue-50">{{
-                      liveData.length
-                    }}</span>
-                  </div>
-                  <div
-                    class="flex justify-between items-center py-2 border-b border-blue-600/30 last:border-0"
-                  >
-                    <span class="font-medium text-blue-100 text-sm"
-                      >{{ marketOpen ? 'Current' : 'Previous' }} Total Volume Traded</span
-                    >
-                    <span class="font-semibold text-blue-50">{{
-                      totalVolume.toLocaleString()
-                    }}</span>
-                  </div>
-                  <div
-                    v-if="gseIndex"
-                    class="flex justify-between items-center py-2 border-b border-blue-600/30 last:border-0"
-                  >
-                    <span class="font-medium text-blue-100 text-sm"
-                      >{{ marketOpen ? 'Current' : 'Previous' }} GSE Index</span
-                    >
-                    <span class="font-semibold text-blue-50"
-                      >{{ gseIndex.index.toFixed(2) }} ({{
-                        gseIndex.change === 0
-                          ? ""
-                          : gseIndex.change > 0
-                            ? "+"
-                            : ""
-                      }}{{ gseIndex.change.toFixed(2) }} ({{
-                        gseIndex.percentChange.toFixed(2)
-                      }}%))</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Market Summary Explanation -->
-            <div
-              class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-lg"
-            >
-              <h3
-                class="text-lg font-bold text-white mb-3 flex items-center gap-2"
-              >
-                <span>🔍</span> Market Analysis
-              </h3>
-              <div
-                class="space-y-4 text-gray-300 leading-relaxed"
-                v-html="marketAnalysisText"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Disclaimer -->
+      <!-- Market status band -->
       <div
-        class="max-w-6xl mx-auto mt-8 p-6 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-200 rounded-2xl shadow-sm"
+        class="grid grid-cols-1 md:grid-cols-[2fr_1fr] border-2 border-divider border-t-4"
+        :style="{ borderTopColor: marketOpen ? 'var(--color-positive)' : 'var(--color-accent)' }"
       >
-        <p class="text-sm text-yellow-900 leading-relaxed">
-          <strong>Disclaimer:</strong> This data is provided for informational
-          purposes only. Real-time market data may have slight delays. Always
-          verify with official Ghana Stock Exchange sources before making
-          investment decisions.
-        </p>
+        <div class="p-6 border-b-2 md:border-b-0 md:border-r-2 border-divider">
+          <div class="flex items-center gap-2.5 mb-1.5">
+            <span
+              class="w-2.5 h-2.5 rounded-full"
+              :class="marketOpen ? 'gse-live-dot' : ''"
+              :style="{ background: marketOpen ? 'var(--color-positive)' : 'var(--color-negative)' }"
+            ></span>
+            <h6 class="!m-0">{{ marketOpen ? "Live" : "Closed" }}</h6>
+          </div>
+          <h2 class="!mb-2">{{ marketOpen ? "Market is open" : "Market is closed" }}</h2>
+          <p class="text-muted !mb-0">
+            {{ marketOpen ? `Closes in ${timeRemaining}` : `Opens in ${timeToOpen}` }}
+          </p>
+          <p class="text-muted mt-2 text-xs">Market hours 10:00&ndash;15:00 GMT</p>
+        </div>
+        <div class="p-6 flex flex-col justify-center gap-2">
+          <div class="flex justify-between items-baseline">
+            <h6 class="!m-0">Composite change</h6>
+            <span class="text-muted text-[11px]">GSE-CI</span>
+          </div>
+          <h3 class="!m-0" :style="{ color: compositeColor }">{{ compositeChangeLabel }}</h3>
+          <CompositeChart :points="compositeHistory" />
+          <div v-if="compositeHistory.length >= 2" class="flex justify-between">
+            <span class="text-muted text-[10px]">{{ compositeHistory[0].date }}</span>
+            <span class="text-muted text-[10px]">{{ compositeHistory[compositeHistory.length - 1].date }}</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Toast Notifications -->
-      <div class="fixed bottom-6 right-6 z-50 space-y-2">
-        <div
-          v-for="toast in toasts"
-          :key="toast.id"
-          class="flex items-center p-4 rounded-xl shadow-lg border-l-4 animate-slideInRight bg-white backdrop-blur-sm"
-          :class="
-            toast.type === 'error' ? 'border-red-500' : 'border-emerald-500'
-          "
-          role="alert"
-        >
-          <span class="mr-3 text-xl">{{
-            toast.type === "error" ? "⚠️" : "✅"
-          }}</span>
-          <div>
-            <h4 class="font-semibold text-gray-800">
-              {{ toast.type === "error" ? "Error" : "Success" }}
-            </h4>
-            <p class="text-sm text-gray-600">{{ toast.message }}</p>
+      <!-- Market summary (closed only) -->
+      <div v-if="!marketOpen" class="mt-6 border-2 border-t-0 border-divider p-6">
+        <div class="flex items-center gap-1.5 mb-3">
+          <span class="w-2 h-2 rounded-full bg-ink shrink-0"></span>
+          <h5 class="!m-0">Today's market summary</h5>
+          <span class="text-muted text-xs">{{ dateDisplay }}</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div
+            v-for="card in summaryCards"
+            :key="card.title"
+            class="gse-sum-card border-2 border-divider p-4 relative overflow-hidden"
+            :style="{ '--gse-accent': card.accent }"
+          >
+            <h6 class="text-muted !mb-2.5">{{ card.title }}</h6>
+            <div v-if="card.stock" class="flex items-center gap-2 mb-3">
+              <LogoChip :stock="card.stock" size="32" />
+              <div class="min-w-0">
+                <div class="font-semibold text-sm truncate">{{ card.stock.name }}</div>
+                <span class="text-muted text-[11px]">{{ card.stock.sector }}</span>
+              </div>
+            </div>
+            <div v-else class="text-muted text-sm mb-3">&mdash;</div>
+            <h3 class="!m-0" :style="{ color: card.color }">{{ card.label }}</h3>
+          </div>
+        </div>
+        <p class="text-muted mt-4 leading-relaxed">{{ marketAnalysisText }}</p>
+      </div>
+
+      <!-- Stats row -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 border-2 border-divider border-t-0 mt-6">
+        <div class="p-4 sm:px-6 border-b sm:border-b-0 sm:border-r border-divider">
+          <h6 class="text-muted !mb-1.5">Listed companies</h6>
+          <h3 class="!m-0">{{ liveData.length }}</h3>
+        </div>
+        <div class="p-4 sm:px-6 border-b sm:border-b-0 sm:border-r border-divider">
+          <h6 class="text-muted !mb-1.5">Volume traded</h6>
+          <h3 class="!m-0 tabular-nums">{{ totalVolume.toLocaleString() }}</h3>
+        </div>
+        <div class="p-4 sm:px-6">
+          <h6 class="text-muted !mb-1.5">Advancing / declining</h6>
+          <h3 class="!m-0">
+            <span style="color: var(--color-positive)">{{ gainersCount }}</span>
+            <span class="text-muted text-base"> / </span>
+            <span style="color: var(--color-negative)">{{ losersCount }}</span>
+          </h3>
+        </div>
+      </div>
+
+      <!-- Gainers / Losers -->
+      <div class="grid grid-cols-1 md:grid-cols-2 mt-8 gap-6 md:gap-0">
+        <div class="md:pr-6 md:border-r-2 border-divider">
+          <div class="flex items-center gap-2 mb-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+            <h4 class="!m-0">Top gainers</h4>
+          </div>
+          <div
+            v-for="(s, i) in gainers"
+            :key="s.symbol ?? s.name"
+            class="gse-row grid items-center gap-3 py-2 border-b border-divider last:border-0 cursor-pointer"
+            style="grid-template-columns: 20px 36px 1fr auto auto"
+            @click="openStockDetail(s)"
+          >
+            <span class="text-muted text-[11px]">{{ i + 1 }}</span>
+            <LogoChip :stock="s" size="36" />
+            <div class="min-w-0">
+              <div class="font-semibold truncate">{{ s.name }}</div>
+              <span class="text-muted text-[11px]">{{ s.sector }}</span>
+            </div>
+            <span class="font-semibold tabular-nums">{{ formatPrice(s.price) }}</span>
+            <span class="font-semibold tabular-nums" style="color: var(--color-positive)">&#9650; {{ s.change.toFixed(2) }}</span>
+          </div>
+        </div>
+        <div class="md:pl-6">
+          <div class="flex items-center gap-2 mb-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-negative)" stroke-width="2"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
+            <h4 class="!m-0">Top losers</h4>
+          </div>
+          <div
+            v-for="(s, i) in losers"
+            :key="s.symbol ?? s.name"
+            class="gse-row grid items-center gap-3 py-2 border-b border-divider last:border-0 cursor-pointer"
+            style="grid-template-columns: 20px 36px 1fr auto auto"
+            @click="openStockDetail(s)"
+          >
+            <span class="text-muted text-[11px]">{{ i + 1 }}</span>
+            <LogoChip :stock="s" size="36" />
+            <div class="min-w-0">
+              <div class="font-semibold truncate">{{ s.name }}</div>
+              <span class="text-muted text-[11px]">{{ s.sector }}</span>
+            </div>
+            <span class="font-semibold tabular-nums">{{ formatPrice(s.price) }}</span>
+            <span class="font-semibold tabular-nums" style="color: var(--color-negative)">&#9660; {{ Math.abs(s.change).toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <!-- All companies -->
+      <div>
+        <div class="flex items-center gap-3 flex-wrap mb-4">
+          <h4 class="!m-0 mr-auto">All companies</h4>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search name or symbol"
+            class="bg-surface border border-divider px-2.5 py-1.5 text-sm w-[220px] min-h-[36px]"
+          />
+          <div class="inline-flex overflow-hidden border border-divider">
+            <label
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] cursor-pointer"
+              :class="sortDir === 'asc' ? 'bg-accent text-bg' : 'hover:bg-black/5'"
+            >
+              <input type="radio" name="sort-dir" class="sr-only" :checked="sortDir === 'asc'" @change="sortDir = 'asc'" />
+              A &rarr; Z
+            </label>
+            <label
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] cursor-pointer border-l border-divider"
+              :class="sortDir === 'desc' ? 'bg-accent text-bg' : 'hover:bg-black/5'"
+            >
+              <input type="radio" name="sort-dir" class="sr-only" :checked="sortDir === 'desc'" @change="sortDir = 'desc'" />
+              Z &rarr; A
+            </label>
           </div>
           <button
-            @click="removeToast(toast.id)"
-            class="ml-4 text-gray-400 hover:text-gray-600"
+            class="inline-flex items-center gap-1.5 border px-3 py-1.5 text-[13px] font-heading font-extrabold"
+            :class="showWatchlistOnly ? 'bg-accent-100 border-accent' : 'border-divider'"
+            @click="showWatchlistOnly = !showWatchlistOnly"
           >
-            ✕
+            <svg width="14" height="14" viewBox="0 0 24 24" :fill="showWatchlistOnly ? 'var(--color-accent)' : 'none'" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 20.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+            Watchlist
           </button>
+          <a
+            :href="csvExportUrl"
+            download
+            class="inline-flex items-center gap-1.5 border border-divider px-3 py-1.5 text-[13px] font-heading font-extrabold"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>
+            Export CSV
+          </a>
+        </div>
+
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="text-left text-[11px] tracking-wide uppercase text-muted p-2 border-b-2 border-divider">Company</th>
+              <th class="text-left text-[11px] tracking-wide uppercase text-muted p-2 border-b-2 border-divider">Sector</th>
+              <th class="text-right text-[11px] tracking-wide uppercase text-muted p-2 border-b-2 border-divider">Volume</th>
+              <th class="text-right text-[11px] tracking-wide uppercase text-muted p-2 border-b-2 border-divider">Price</th>
+              <th class="text-right text-[11px] tracking-wide uppercase text-muted p-2 border-b-2 border-divider">Change</th>
+              <th class="p-2 border-b-2 border-divider"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="s in paginatedStocks"
+              :key="s.symbol ?? s.name"
+              class="cursor-pointer hover:bg-black/[0.04]"
+              @click="openStockDetail(s)"
+            >
+              <td class="p-2 border-b border-divider">
+                <div class="flex items-center gap-3">
+                  <LogoChip :stock="s" size="34" />
+                  <div class="font-semibold">{{ s.name }}</div>
+                </div>
+              </td>
+              <td class="p-2 border-b border-divider text-muted">{{ s.sector }}</td>
+              <td class="p-2 border-b border-divider text-right tabular-nums">{{ s.volume.toLocaleString() }}</td>
+              <td class="p-2 border-b border-divider text-right font-semibold tabular-nums">{{ formatPrice(s.price) }}</td>
+              <td
+                class="p-2 border-b border-divider text-right font-semibold tabular-nums"
+                :style="{ color: s.change > 0 ? 'var(--color-positive)' : s.change < 0 ? 'var(--color-negative)' : 'var(--color-text)' }"
+              >
+                {{ s.change > 0 ? "+" : "" }}{{ s.change.toFixed(2) }} ({{ (Math.abs(s.change) / s.price * 100).toFixed(1) }}%)
+              </td>
+              <td class="p-2 border-b border-divider text-right">
+                <button
+                  class="w-8 h-8 inline-flex items-center justify-center"
+                  :aria-label="isWatched(s.symbol) ? 'Remove from watchlist' : 'Add to watchlist'"
+                  @click.stop="toggleWatchlist(s.symbol)"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" :fill="isWatched(s.symbol) ? 'var(--color-accent)' : 'none'" stroke="var(--color-text)" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 20.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                </button>
+              </td>
+            </tr>
+            <tr v-if="paginatedStocks.length === 0">
+              <td colspan="6" class="text-center p-8 text-muted">No companies match this filter.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="flex items-center justify-between pt-3">
+          <p class="text-muted text-xs !m-0">{{ pageSummary }}</p>
+          <div class="flex gap-1.5">
+            <button
+              class="border border-divider w-9 h-9 inline-flex items-center justify-center disabled:opacity-45 disabled:cursor-not-allowed"
+              :disabled="page === 0"
+              aria-label="Previous page"
+              @click="page = Math.max(0, page - 1)"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"></path></svg>
+            </button>
+            <button
+              class="border border-divider w-9 h-9 inline-flex items-center justify-center disabled:opacity-45 disabled:cursor-not-allowed"
+              :disabled="page >= totalPages - 1"
+              aria-label="Next page"
+              @click="page = Math.min(totalPages - 1, page + 1)"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"></path></svg>
+            </button>
+          </div>
         </div>
       </div>
+
+      <div class="hr mt-8"></div>
+      <p class="text-muted text-xs max-w-[640px]">
+        Disclaimer &mdash; this data is illustrative only. Real-time market data may be delayed; verify with the official Ghana Stock Exchange before making investment decisions.
+      </p>
     </div>
+
+    <!-- Toasts -->
+    <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 w-[280px]">
+      <div
+        v-for="toast in toasts"
+        :key="toast.id"
+        class="bg-bg border border-divider border-l-[3px] shadow-md p-3 flex justify-between gap-2 items-start animate-slideInRight"
+        :style="{ borderLeftColor: toast.type === 'error' ? 'var(--color-accent)' : 'var(--color-text)' }"
+        role="alert"
+      >
+        <p class="!m-0 text-sm">{{ toast.message }}</p>
+        <button class="bg-transparent border-0 cursor-pointer text-ink" @click="removeToast(toast.id)">&times;</button>
+      </div>
+    </div>
+
+    <StockDetailModal :stock="selectedStock" @close="closeStockDetail" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import axios from "axios";
-
-interface MarketData {
-  symbol: string | null;
-  name: string;
-  company_name: string;
-  price: number;
-  change: number;
-  volume: number;
-  logo_url?: string;
-  sector?: string;
-}
-
-interface StockIndex {
-  index: number;
-  change: number;
-  percentChange: number;
-}
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { useRoute } from "vue-router";
+import CompositeChart from "../components/CompositeChart.vue";
+import StockDetailModal from "../components/StockDetailModal.vue";
+import LogoChip from "../components/LogoChip.vue";
+import {
+  fetchLiveData,
+  fetchComposite,
+  fetchCompositeHistory,
+  csvExportUrl,
+  type MarketData,
+  type CompositeSummary,
+  type CompositeHistoryPoint,
+} from "../services/api";
+import { useWatchlist } from "../composables/useWatchlist";
+import { useCurrency } from "../composables/useCurrency";
 
 interface Toast {
   id: number;
@@ -788,54 +303,43 @@ interface Toast {
   type: "success" | "error";
 }
 
+const route = useRoute();
+
 const liveData = ref<MarketData[]>([]);
 const gainers = ref<MarketData[]>([]);
 const losers = ref<MarketData[]>([]);
-const gseIndex = ref<StockIndex | null>(null);
+const compositeData = ref<CompositeSummary | null>(null);
+const compositeHistory = ref<CompositeHistoryPoint[]>([]);
 const loading = ref(true);
 const searchQuery = ref("");
-const sortBy = ref("name");
+const sortDir = ref<"asc" | "desc">("asc");
 const toasts = ref<Toast[]>([]);
-const stockLogos = ref<Record<string, string>>({});
-const currentPage = ref(1);
-const itemsPerPage = 10;
+const page = ref(0);
+const pageSize = 6;
+const showWatchlistOnly = ref(route.query.watchlist === "1");
+const selectedStock = ref<MarketData | null>(null);
 
-const API_BASE = "/api/v1";
+const { isWatched, toggle: toggleWatchlist } = useWatchlist();
+const { formatPrice } = useCurrency();
+
+watch(
+  () => route.query.watchlist,
+  (v) => {
+    if (v === "1") showWatchlistOnly.value = true;
+  },
+);
 
 const isNextDayMode = computed(() => {
   const now = new Date();
-  console.log('Current Hour:', now.getHours(), 'Current Minute:', now.getMinutes());
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentTimeInMinutes = currentHour * 60 + currentMinute;
-  const marketOpenTime = 10 * 60;
-  const midnightMinutes = 0;
-  const inNextDayMode = (
-    currentTimeInMinutes >= midnightMinutes &&
-    currentTimeInMinutes < marketOpenTime
-  );
-  console.log('isNextDayMode:', inNextDayMode, 'currentTimeInMinutes:', currentTimeInMinutes, 'marketOpenTime:', marketOpenTime);
-  return inNextDayMode;
+  const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+  return currentTimeInMinutes >= 0 && currentTimeInMinutes < 10 * 60;
 });
 
 const marketOpen = computed(() => {
+  if (isNextDayMode.value) return false;
   const now = new Date();
-  console.log('Market Check - Hour:', now.getHours(), 'Minute:', now.getMinutes());
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentTimeInMinutes = currentHour * 60 + currentMinute;
-  const marketOpenTime = 10 * 60;
-  const marketCloseTime = 15 * 60;
-  if (isNextDayMode.value) {
-    console.log('Market Closed - Next Day Mode');
-    return false;
-  }
-  const isOpen = (
-    currentTimeInMinutes >= marketOpenTime &&
-    currentTimeInMinutes < marketCloseTime
-  );
-  console.log('Market Open:', isOpen, 'currentTimeInMinutes:', currentTimeInMinutes, 'openTime:', marketOpenTime, 'closeTime:', marketCloseTime);
-  return isOpen;
+  const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+  return currentTimeInMinutes >= 10 * 60 && currentTimeInMinutes < 15 * 60;
 });
 
 const timeRemaining = computed(() => {
@@ -857,199 +361,114 @@ const timeToOpen = computed(() => {
   const openTimeTomorrow = new Date();
   openTimeTomorrow.setDate(openTimeTomorrow.getDate() + 1);
   openTimeTomorrow.setUTCHours(10, 0, 0, 0);
-  const timeToOpen =
+  const diff =
     now.getTime() < openTimeToday.getTime()
       ? openTimeToday.getTime() - now.getTime()
       : openTimeTomorrow.getTime() - now.getTime();
-  const hours = Math.floor(timeToOpen / (1000 * 60 * 60));
-  const minutes = Math.floor((timeToOpen % (1000 * 60 * 60)) / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   return `${hours}h ${minutes}m`;
 });
 
-const getCurrentDateDisplay = (isPreviousDay: boolean = false) => {
-  const now = new Date();
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const dateObj = isPreviousDay ? new Date(now.getTime() - 86400000) : now;
-  const day = dateObj.getDate();
-  const month = monthNames[dateObj.getMonth()];
-  const year = dateObj.getFullYear();
-  return `${month} ${day}, ${year}`;
-};
-
 const dateDisplay = computed(() => {
-  const display = getCurrentDateDisplay(isNextDayMode.value);
-  console.log('dateDisplay:', display, 'isNextDayMode:', isNextDayMode.value);
-  return display;
+  const now = new Date();
+  const dateObj = isNextDayMode.value ? new Date(now.getTime() - 86400000) : now;
+  return dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 });
 
-const totalVolume = computed(() =>
-  liveData.value.reduce((sum, stock) => sum + stock.volume, 0),
+const compositeChangeLabel = computed(() => {
+  if (!compositeData.value) return "--";
+  const v = compositeData.value.composite_change_percent;
+  return `${v > 0 ? "+" : ""}${v.toFixed(2)}%`;
+});
+const compositeColor = computed(() => {
+  const v = compositeData.value?.composite_change_percent ?? 0;
+  return v >= 0 ? "var(--color-positive)" : "var(--color-negative)";
+});
+
+const totalVolume = computed(() => liveData.value.reduce((sum, s) => sum + s.volume, 0));
+const gainersCount = computed(() => liveData.value.filter((s) => s.change > 0).length);
+const losersCount = computed(() => liveData.value.filter((s) => s.change < 0).length);
+
+const byPercent = computed(() =>
+  [...liveData.value].sort((a, b) => b.change / b.price - a.change / a.price),
 );
 
-const sortedStocks = computed(() => {
-  let stocks = [...liveData.value];
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    stocks = stocks.filter(
-      (stock) =>
-        stock.name.toLowerCase().includes(query) ||
-        (stock.symbol && stock.symbol.toLowerCase().includes(query)),
-    );
-  }
-  const direction = sortBy.value.startsWith("-") ? -1 : 1;
-  const field = sortBy.value.replace("-", "") as keyof MarketData;
-  stocks.sort((a, b) => {
-    const valueA = a[field];
-    const valueB = b[field];
-    if (typeof valueA === "string" && typeof valueB === "string")
-      return direction * valueA.localeCompare(valueB);
-    return direction * (Number(valueA) - Number(valueB));
-  });
-  return stocks;
+interface SummaryCard {
+  title: string;
+  stock: MarketData | null;
+  label: string;
+  color: string;
+  accent: string;
+}
+
+const changeSignLabel = (s: MarketData) =>
+  `${s.change > 0 ? "+" : ""}${s.change.toFixed(2)} (${((s.change / s.price) * 100).toFixed(1)}%)`;
+
+const summaryCards = computed<SummaryCard[]>(() => {
+  const topGainer = gainers.value[0] ?? null;
+  const topLoser = losers.value[0] ?? null;
+  const bestPerformer = byPercent.value[0] ?? null;
+  const worstPerformer = byPercent.value[byPercent.value.length - 1] ?? null;
+  return [
+    { title: "Top gainer", stock: topGainer, label: topGainer ? changeSignLabel(topGainer) : "--", color: "var(--color-positive)", accent: "var(--color-positive)" },
+    { title: "Top loser", stock: topLoser, label: topLoser ? changeSignLabel(topLoser) : "--", color: "var(--color-negative)", accent: "var(--color-negative)" },
+    { title: "Best performer", stock: bestPerformer, label: bestPerformer ? changeSignLabel(bestPerformer) : "--", color: bestPerformer && bestPerformer.change >= 0 ? "var(--color-positive)" : "var(--color-negative)", accent: "var(--color-accent)" },
+    { title: "Worst performer", stock: worstPerformer, label: worstPerformer ? changeSignLabel(worstPerformer) : "--", color: worstPerformer && worstPerformer.change >= 0 ? "var(--color-positive)" : "var(--color-negative)", accent: "var(--color-accent-700)" },
+  ];
 });
 
 const marketAnalysisText = computed(() => {
-  const gainersList = gainers.value
-    .map((s) => {
-      const change = s.change;
-      const percent = ((change / s.price) * 100).toFixed(2);
-      const colorClass =
-        change > 0
-          ? "text-emerald-300 font-bold"
-          : change < 0
-            ? "text-rose-300 font-bold"
-            : "text-gray-300 font-bold";
-      const changeStr =
-        change > 0 ? `+${change.toFixed(2)}` : `${change.toFixed(2)}`;
-      return `<span class="${colorClass}">${s.name} (${changeStr} (${percent}%))</span>`;
-    })
-    .join(", ");
-
-  const losersList = losers.value
-    .map((s) => {
-      const change = s.change;
-      const percent = ((change / s.price) * 100).toFixed(2);
-      const colorClass =
-        change > 0
-          ? "text-emerald-300 font-bold"
-          : change < 0
-            ? "text-rose-300 font-bold"
-            : "text-gray-300 font-bold";
-      const changeStr =
-        change > 0 ? `+${change.toFixed(2)}` : `${change.toFixed(2)}`;
-      return `<span class="${colorClass}">${s.name} (${changeStr} (${percent}%))</span>`;
-    })
-    .join(", ");
-
-  const trend = gseIndex.value
-    ? gseIndex.value.change > 0
-      ? "positive"
-      : gseIndex.value.change < 0
-        ? "negative"
-        : "flat"
-    : "flat";
-
-  return `
-    <p>As of ${dateDisplay.value}, the market recorded notable movements across several listed equities.</p>
-    <p>The Top Gainers were led by ${gainersList}, with strong upward price movements reflecting increased buying interest and positive market sentiment.</p>
-    <p>On the other hand, the Top Losers included ${losersList}, indicating selling pressure or reduced investor confidence in these stocks during the trading session.</p>
-    <p>Overall, the market activity saw a total of ${liveData.value.length} stocks traded, with a cumulative volume of ${totalVolume.value.toLocaleString()} shares exchanged. The broader market direction, as reflected by the index, shows a ${trend} trend.</p>
-  `;
+  const topGainer = gainers.value[0];
+  const topLoser = losers.value[0];
+  const trend = (compositeData.value?.composite_change_percent ?? 0) >= 0 ? "up" : "down";
+  const change = Math.abs(compositeData.value?.composite_change_percent ?? 0).toFixed(2);
+  return `As of ${dateDisplay.value}, ${liveData.value.length} listed companies traded a combined ${totalVolume.value.toLocaleString()} shares. ${topGainer ? topGainer.name : "The market"} led advancers while ${topLoser ? topLoser.name : "declines were broad"}${topLoser ? " led decliners" : ""}, leaving the composite ${trend} ${change}% on the session.`;
 });
 
-const totalPages = computed(() =>
-  Math.ceil(sortedStocks.value.length / itemsPerPage),
-);
+const sortedStocks = computed(() => {
+  let stocks = [...liveData.value];
+  if (showWatchlistOnly.value) {
+    stocks = stocks.filter((s) => isWatched(s.symbol));
+  }
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase();
+    stocks = stocks.filter(
+      (s) => s.name.toLowerCase().includes(q) || (s.symbol && s.symbol.toLowerCase().includes(q)),
+    );
+  }
+  const dir = sortDir.value === "asc" ? 1 : -1;
+  stocks.sort((a, b) => dir * a.name.localeCompare(b.name));
+  return stocks;
+});
+
+const totalPages = computed(() => Math.max(1, Math.ceil(sortedStocks.value.length / pageSize)));
 
 const paginatedStocks = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return sortedStocks.value.slice(start, start + itemsPerPage);
+  const clampedPage = Math.min(page.value, totalPages.value - 1);
+  const start = clampedPage * pageSize;
+  return sortedStocks.value.slice(start, start + pageSize);
 });
 
-const getChangeColorClass = (change: number): string => {
-  if (change === 0 || change === 0.0) {
-    return "bg-gray-100 text-gray-600";
-  } else if (change > 0) {
-    return "bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700 shadow-sm";
-  } else {
-    return "bg-gradient-to-r from-rose-100 to-rose-200 text-rose-700 shadow-sm";
-  }
-};
+const pageSummary = computed(() => {
+  const total = sortedStocks.value.length;
+  if (total === 0) return "No companies";
+  const clampedPage = Math.min(page.value, totalPages.value - 1);
+  const start = clampedPage * pageSize + 1;
+  const end = Math.min((clampedPage + 1) * pageSize, total);
+  return `Showing ${start}–${end} of ${total}`;
+});
 
-const loadStockLogos = async () => {
-  try {
-    const response = await fetch("/stocks.txt");
-    if (response.ok) {
-      const data: { stocks: Array<{ symbol: string; logo_url: string }> } =
-        await response.json();
-      data.stocks.forEach((stock) => {
-        stockLogos.value[stock.symbol] = stock.logo_url;
-      });
-    }
-  } catch (error) {
-    console.error("Error loading stock logos:", error);
-  }
-};
+watch([searchQuery, showWatchlistOnly], () => {
+  page.value = 0;
+});
 
 const fetchLiveMarketData = async () => {
   loading.value = true;
-  console.log('Fetching live market data...');
   try {
-    const response = await axios.get(`${API_BASE}/gse/live`);
-    console.log('API Response:', response.data);
-    const liveDataList = response.data as Array<
-      { symbol: string; logo_url?: string } & MarketData
-    >;
-    liveData.value = liveDataList.map((stock) => ({
-      ...stock,
-      logo_url: stockLogos.value[stock.symbol] || stock.logo_url,
-    }));
-    console.log('Live Data:', liveData.value);
-    gainers.value = liveData.value
-      .filter((s) => s.change > 0)
-      .sort((a, b) => b.change - a.change)
-      .slice(0, 8);
-    console.log('Total stocks:', liveData.value.length);
-    console.log('Stocks with positive change:', gainers.value.length);
-    gainers.value.forEach((s, i) => console.log(`Gainer ${i+1}:`, s.name, 'change:', s.change));
-    losers.value = liveData.value
-      .filter((s) => s.change < 0)
-      .sort((a, b) => a.change - b.change)
-      .slice(0, 8);
-    console.log('Stocks with negative change:', losers.value.length);
-    losers.value.forEach((s, i) => console.log(`Loser ${i+1}:`, s.name, 'change:', s.change));
-    if (liveData.value.length > 0) {
-      const totalValue = liveData.value.reduce(
-        (sum, stock) => sum + stock.price,
-        0,
-      );
-      const prevTotalValue =
-        totalValue -
-        liveData.value.reduce((sum, stock) => sum + stock.change, 0);
-      const indexChange = liveData.value.reduce(
-        (sum, stock) => sum + stock.change,
-        0,
-      );
-      gseIndex.value = {
-        index: (totalValue / liveData.value.length) * 1000,
-        change: indexChange,
-        percentChange: (indexChange / prevTotalValue) * 100,
-      };
-      console.log('GSE Index:', gseIndex.value);
-    }
+    liveData.value = await fetchLiveData();
+    gainers.value = liveData.value.filter((s) => s.change > 0).sort((a, b) => b.change - a.change).slice(0, 5);
+    losers.value = liveData.value.filter((s) => s.change < 0).sort((a, b) => a.change - b.change).slice(0, 5);
   } catch (error) {
     console.error("Error fetching live market data:", error);
     addToast("Failed to load market data", "error");
@@ -1058,87 +477,43 @@ const fetchLiveMarketData = async () => {
   }
 };
 
+const fetchCompositeData = async () => {
+  try {
+    compositeData.value = await fetchComposite();
+    compositeHistory.value = await fetchCompositeHistory();
+  } catch (error) {
+    console.error("Error fetching composite data:", error);
+  }
+};
+
+const openStockDetail = (stock: MarketData) => {
+  selectedStock.value = stock;
+};
+const closeStockDetail = () => {
+  selectedStock.value = null;
+};
+
 const addToast = (message: string, type: "success" | "error" = "success") => {
   const id = Date.now();
   toasts.value.push({ id, message, type });
   setTimeout(() => removeToast(id), 3000);
 };
-
 const removeToast = (id: number) => {
   toasts.value = toasts.value.filter((t) => t.id !== id);
 };
 
+let marketDataInterval: number | null = null;
+
 onMounted(() => {
-  loadStockLogos();
   fetchLiveMarketData();
-
-  // Real-time updates for market status and stock data
-  // Update stock data every 60 seconds
-  const marketDataInterval = window.setInterval(() => {
+  fetchCompositeData();
+  marketDataInterval = window.setInterval(() => {
     fetchLiveMarketData();
+    fetchCompositeData();
   }, 60000);
-
-  onUnmounted(() => {
-    if (marketDataInterval) clearInterval(marketDataInterval);
-  });
 });
-
-const calculateTimeToNextSwitch = () => {
-  const now = new Date();
-  const currentHour = now.getUTCHours();
-
-  if (currentHour < 10) {
-    const nextSwitch = new Date();
-    nextSwitch.setUTCHours(10, 0, 0, 0);
-    return nextSwitch.getTime() - now.getTime();
-  } else {
-    const nextSwitch = new Date();
-    nextSwitch.setUTCHours(0, 0, 0, 0);
-    nextSwitch.setDate(nextSwitch.getDate() + 1);
-    return nextSwitch.getTime() - now.getTime();
-  }
-};
-
-const setupDateRefresh = () => {
-  const timeToSwitch = calculateTimeToNextSwitch();
-  setTimeout(() => {
-    fetchLiveMarketData();
-    setupDateRefresh();
-  }, timeToSwitch);
-};
-
-const currentInterval = ref<number | null>(null);
 
 onUnmounted(() => {
-  if (currentInterval.value) clearInterval(currentInterval.value);
+  if (marketDataInterval) clearInterval(marketDataInterval);
 });
 </script>
-
-<style scoped>
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out forwards;
-}
-.animate-slideInRight {
-  animation: slideInRight 0.3s ease-out forwards;
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-</style>
