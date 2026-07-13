@@ -39,7 +39,7 @@ test("search filters the company table", async ({ page }) => {
 test("shows the empty state when no company matches the filter", async ({ page }) => {
   await page.goto("/");
   await page.getByPlaceholder("Search name or symbol").fill("nonexistent-co");
-  await expect(page.getByText("No companies match this filter.")).toBeVisible();
+  await expect(page.locator("tbody").getByText("No companies match this filter.")).toBeVisible();
 });
 
 test("A-Z / Z-A sort toggles table order", async ({ page }) => {
@@ -53,7 +53,7 @@ test("A-Z / Z-A sort toggles table order", async ({ page }) => {
 
 test("watchlist toggle adds a row and filters the table to it", async ({ page }) => {
   await page.goto("/");
-  await page.locator("tbody tr", { hasText: "Gold Coast Mining" }).getByLabel("Add to watchlist").click();
+  await page.locator("tbody tr", { hasText: "Gold Coast Mining" }).getByLabel("Toggle watchlist").click();
 
   await page.getByRole("button", { name: "Watchlist", exact: true }).click();
   await expect(page.locator("tbody tr")).toHaveCount(1);
@@ -88,12 +88,12 @@ test("clicking a row opens the stock detail modal with price history", async ({ 
   await page.getByPlaceholder("Search name or symbol").fill("Volta Bank");
   await page.locator("tbody tr", { hasText: "Volta Bank" }).click();
 
-  const dialog = page.locator(".fixed.inset-0");
-  await expect(dialog.getByText("30-day price history")).toBeVisible();
+  const dialog = page.locator(".dialog-backdrop");
+  await expect(dialog.getByText("Price history")).toBeVisible();
   await expect(dialog.getByRole("button", { name: "☆ Watch" })).toBeVisible();
 
   await dialog.getByRole("button", { name: "Close", exact: true }).last().click();
-  await expect(page.getByText("30-day price history")).not.toBeVisible();
+  await expect(page.getByText("Price history")).not.toBeVisible();
 });
 
 test("CSV export link points at the backend export endpoint", async ({ page }) => {
@@ -102,12 +102,11 @@ test("CSV export link points at the backend export endpoint", async ({ page }) =
   expect(href).toBe("/api/v1/gse/export/csv");
 });
 
-test("watchlist nav link pre-filters the table via query param", async ({ page }) => {
+test("watchlist nav link filters the table to watched rows", async ({ page }) => {
   await page.goto("/");
-  await page.locator("tbody tr", { hasText: "Kente Textiles" }).getByLabel("Add to watchlist").click();
+  await page.locator("tbody tr", { hasText: "Kente Textiles" }).getByLabel("Toggle watchlist").click();
 
-  await page.getByRole("link", { name: "Watchlist" }).click();
-  await expect(page).toHaveURL(/watchlist=1/);
+  await page.locator("nav a", { hasText: "Watchlist" }).click();
   await expect(page.locator("tbody tr")).toHaveCount(1);
   await expect(page.locator("tbody")).toContainText("Kente Textiles");
 });

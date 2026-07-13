@@ -2,20 +2,21 @@
   <div>
     <div
       v-if="points.length < 2"
-      class="flex flex-col items-center justify-center py-8 text-center"
+      class="flex flex-col items-center justify-center py-12 text-center"
     >
-      <p class="font-semibold !m-0">Building price history</p>
-      <p class="text-sm text-muted mt-1 max-w-xs">
-        History starts accumulating from today, one trading day at a time &mdash; check
+      <span class="text-4xl mb-3">📈</span>
+      <p class="text-gray-600 font-medium">Building price history</p>
+      <p class="text-sm text-gray-400 mt-1 max-w-xs">
+        History starts accumulating from today, one trading day at a time — check
         back soon.
       </p>
-      <p v-if="points.length === 1" class="text-sm text-muted mt-3">
+      <p v-if="points.length === 1" class="text-sm text-gray-500 mt-3">
         Latest recorded close:
-        <span class="font-semibold text-ink">₵{{ points[0].price.toFixed(2) }}</span>
+        <span class="font-semibold text-gray-700">₵{{ points[0].price.toFixed(2) }}</span>
         on {{ points[0].date }}
       </p>
     </div>
-    <div v-else class="relative h-48">
+    <div v-else class="relative h-56">
       <Line :data="chartData" :options="chartOptions" />
     </div>
   </div>
@@ -43,7 +44,7 @@ const props = defineProps<{ points: HistoryPoint[] }>();
 // Single-series line: color follows the period's direction, matching the
 // gainers(emerald)/losers(rose) convention used throughout the rest of the app.
 const trendColor = computed(() => {
-  if (props.points.length < 2) return "#157a45";
+  if (props.points.length < 2) return "#201e1d";
   const first = props.points[0].price;
   const last = props.points[props.points.length - 1].price;
   return last >= first ? "#157a45" : "#ae1800";
@@ -76,11 +77,9 @@ const chartOptions = computed(() => ({
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: "#201e1d",
-      titleFont: { family: "Archivo, system-ui, sans-serif" },
-      bodyFont: { family: "Archivo, system-ui, sans-serif" },
-      titleColor: "#f3f2f2",
-      bodyColor: "#f3f2f2",
+      backgroundColor: "rgba(11,11,11,0.85)",
+      titleColor: "#ffffff",
+      bodyColor: "#ffffff",
       displayColors: false,
       callbacks: {
         label: (ctx: TooltipItem<"line">) => `₵${(ctx.parsed.y ?? 0).toFixed(2)}`,
@@ -90,11 +89,11 @@ const chartOptions = computed(() => ({
   scales: {
     x: {
       grid: { display: false },
-      ticks: { color: "#7d7979", maxTicksLimit: 6, font: { family: "Archivo, system-ui, sans-serif" } },
+      ticks: { color: "#898781", maxTicksLimit: 6 },
     },
     y: {
-      grid: { color: "#d7d3d3" },
-      ticks: { color: "#7d7979", font: { family: "Archivo, system-ui, sans-serif" } },
+      grid: { color: "#e1e0d9" },
+      ticks: { color: "#898781" },
     },
   },
 }));

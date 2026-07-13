@@ -1,0 +1,55 @@
+# Render Blueprint — deploys the GSE Tracker as two free services:
+#   1. gse-tracker-api  : FastAPI backend (Python web service)
+#   2. gse-tracker-web  : Vue frontend (static site) that proxies /api/* to the API
+#
+# NOTE: service names become the subdomain (https://<name>.onrender.com) and must be
+# globally unique on Render. If you must rename, update the rewrite `destination`
+# and CORS_ORIGINS below to match your chosen names.
+#
+# Free tier caveats: services sleep after ~15 min idle (cold starts), and there is
+# no persistent disk — the SQLite DB (composite history + cached news) resets on
+# each deploy/restart. Tables auto-create on startup, so the app still runs.
+
+services:
+  # ── Backend API ──────────────────────────────────────────────────────────
+  - type: web
+    name: gse-tracker-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -k uvicorn.workers.UvicornWorker app.main:app -b 0.0.0.0:$PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: DEBUG
+        value: "false"
+      - key: GSE_API_URL
+        value: "https://dev.kwayisi.org/apis/gse"
+      # Same-origin via the static-site rewrite means the browser never calls the
+      # API cross-origin, but this keeps direct API access working too. Update if
+      # you rename the web service.
+      - key: CORS_ORIGINS
+        value: "https://gse-tracker-web.onrender.com"
+
+  # ── Frontend static site ─────────────────────────────────────────────────
+  - type: web
+    name: gse-tracker-web
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "20.18.0"
+    routes:
+      # Proxy API calls to the backend service (server-side, so no CORS).
+      - type: rewrite
+        source: /api/*
+        destination: https://gse-tracker-api.onrender.com/api/*
+      # SPA fallback for client-side routing.
+      - type: rewrite
+        source: /*
+        destination: /index.html

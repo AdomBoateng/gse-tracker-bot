@@ -28,7 +28,7 @@ describe("StockDetailModal", () => {
       props: { stock: null },
       global: { stubs: { StockChart: true, teleport: true } },
     });
-    expect(wrapper.find(".fixed").exists()).toBe(false);
+    expect(wrapper.find(".dialog-backdrop").exists()).toBe(false);
   });
 
   it("shows stock details and price history once a stock is selected", async () => {

@@ -22,8 +22,10 @@
     {"symbol":"FAB","company_name":"First Atlantic Bank","sector":"Financials","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/fab.jpg"},
     {"symbol":"GLD","company_name":"NewGold Issuer Ltd.","sector":"Financials","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/gld.jpg"},
     {"symbol":"GCB","company_name":"GCB Bank Plc","sector":"Financials","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/gcb.png"},
-    {"symbol":"GOIL","company_name":"GOIL Plc","sector":"Oil & Gas","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/goil.png"},
+    {"symbol":"KASA","company_name":"Kasapreko Plc","sector":"Consumer Goods","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/kasa.png"},
+    {"symbol":"UNIL","company_name":"Unilever Ghana Ltd","sector":"Consumer Goods","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/unil.png"},
     {"symbol":"GGBL","company_name":"Guinness Ghana Breweries Plc","sector":"Consumer Goods","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/ggbl.png"},
+    {"symbol":"GOIL","company_name":"GOIL PLC","sector":"Oil & Gas","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/goil.png"},
     {"symbol":"MTNGH","company_name":"Scancom Plc (MTN Ghana)","sector":"Telecommunications","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/mtn.png"},
     {"symbol":"RBGH","company_name":"Republic Bank Ghana Plc","sector":"Financials","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/rbgh.jpg"},
     {"symbol":"SCB","company_name":"Standard Chartered Bank Ghana Plc","sector":"Financials","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/scb.png"},
@@ -38,6 +40,7 @@
     {"symbol":"SAMBA","company_name":"Samba Foods Ltd","sector":"Consumer Goods","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/smaba.png"},
     {"symbol":"TBL","company_name":"Trust Bank Ltd (The Gambia)","sector":"Financials","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/tbl.png"},
     {"symbol":"TLW","company_name":"Tullow Oil Plc","sector":"Oil & Gas","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/tlw.png"},
-    {"symbol":"UNIL","company_name":"Unilever Ghana Ltd","sector":"Consumer Goods","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/unil.png"}
+    {"symbol":"UNIL","company_name":"Unilever Ghana Ltd","sector":"Consumer Goods","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/unil.png"},
+    {"symbol":"ZEN","company_name":"ZEN Petroleum","sector":"Oil & Gas","logo_url":"https://fdqilmfldmzqynpvyiql.supabase.co/storage/v1/object/public/GSE-logos/zen.png"}
   ]
 }

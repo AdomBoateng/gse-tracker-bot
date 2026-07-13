@@ -42,6 +42,8 @@ export async function mockApi(page: Page) {
   await page.route("**/api/v1/gse/history/composite**", (route) => route.fulfill({ json: mockCompositeHistory }));
   await page.route(/\/api\/v1\/gse\/history\/[A-Z]+/, (route) => route.fulfill({ json: mockHistory }));
   await page.route("**/api/v1/fx/rates**", (route) => route.fulfill({ json: mockFxRates }));
+  await page.route("**/api/v1/ipos", (route) => route.fulfill({ json: { disclaimer: "", ipos: [] } }));
+  await page.route("**/api/v1/news", (route) => route.fulfill({ json: { disclaimer: "", articles: [] } }));
   await page.route("**/api/v1/gse/export/csv", (route) =>
     route.fulfill({
       contentType: "text/csv",

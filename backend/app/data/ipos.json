@@ -1,0 +1,340 @@
+{
+  "disclaimer": "Educational summary only. The pros and cons below are general observations about each company's public listing and business profile - not investment advice or a recommendation to buy or sell. Verify details with the official Ghana Stock Exchange and each company's prospectus before making any decision.",
+  "ipos": [
+    {
+      "symbol": "MTNGH",
+      "company_name": "Scancom PLC (MTN Ghana)",
+      "sector": "Telecommunications",
+      "listing_year": 2018,
+      "offer_price_ghs": 0.75,
+      "status": "Listed",
+      "summary": "Ghana's largest telecom operator; its 2018 offering was one of the biggest IPOs in the country's history and broadened retail share ownership.",
+      "pros": [
+        "Dominant market share in voice and mobile data across Ghana",
+        "MTN Mobile Money (MoMo) gives it a fast-growing fintech revenue stream",
+        "Large, liquid counter - among the most actively traded on the GSE",
+        "Consistent dividend payer with strong operating cash flow"
+      ],
+      "cons": [
+        "Faces 'Significant Market Power' regulation that can cap pricing and market share",
+        "Sector-specific taxes and levies (including on electronic transfers) pressure margins",
+        "Capital-intensive: continuous network upgrades (4G/5G) require heavy spending",
+        "Earnings exposed to cedi depreciation on foreign-currency costs"
+      ]
+    },
+    {
+      "symbol": "GCB",
+      "company_name": "GCB Bank PLC",
+      "sector": "Financials",
+      "listing_year": 1996,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "One of Ghana's largest indigenous banks by assets and branch network, majority government-linked ownership.",
+      "pros": [
+        "Extensive nationwide branch and ATM footprint",
+        "Large, stable deposit base supports low funding costs",
+        "Systemically important bank with strong brand recognition",
+        "Track record of dividend distribution"
+      ],
+      "cons": [
+        "Exposure to government securities ties earnings to sovereign credit risk",
+        "State influence in ownership can complicate commercial decision-making",
+        "Legacy cost structure and headcount relative to digital-first peers",
+        "Asset quality sensitive to Ghana's macroeconomic cycles"
+      ]
+    },
+    {
+      "symbol": "EGH",
+      "company_name": "Ecobank Ghana PLC",
+      "sector": "Financials",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "The Ghanaian arm of the pan-African Ecobank group, a leading corporate and retail bank.",
+      "pros": [
+        "Backed by a pan-African parent with regional scale and expertise",
+        "Strong corporate and trade-finance franchise",
+        "Well-developed digital banking channels",
+        "Historically profitable with solid return on equity"
+      ],
+      "cons": [
+        "Domestic Debt Exchange Programme impaired holdings of government bonds",
+        "Group-level risk and governance events can spill over to sentiment",
+        "Concentration in corporate lending increases single-name risk",
+        "Competitive pressure on net interest margins"
+      ]
+    },
+    {
+      "symbol": "CAL",
+      "company_name": "CalBank PLC",
+      "sector": "Financials",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "An indigenous Ghanaian bank focused on corporate, SME and retail banking.",
+      "pros": [
+        "Nimble, indigenous bank with a growth-oriented strategy",
+        "Investment in digital and agency banking to widen reach",
+        "History of rewarding shareholders when earnings allow"
+      ],
+      "cons": [
+        "Hit hard by the Domestic Debt Exchange, pressuring capital",
+        "Smaller balance sheet than tier-one peers limits large-ticket lending",
+        "Needed recapitalisation, which can dilute existing shareholders",
+        "Earnings volatility through economic downturns"
+      ]
+    },
+    {
+      "symbol": "GOIL",
+      "company_name": "GOIL PLC",
+      "sector": "Oil & Gas",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "Ghana's leading indigenous downstream petroleum retailer with the widest fuel-station network.",
+      "pros": [
+        "Largest fuel retail network in Ghana by station count",
+        "Strong, trusted national brand with government backing",
+        "Diversification into lubricants, LPG and bulk supply",
+        "Defensive demand - fuel consumption is relatively steady"
+      ],
+      "cons": [
+        "Margins are regulated and thin in downstream fuel retail",
+        "Working capital heavily exposed to cedi/dollar movements on imports",
+        "Price deregulation exposes it to global crude volatility",
+        "Receivables from bulk/government customers can strain cash flow"
+      ]
+    },
+    {
+      "symbol": "TOTAL",
+      "company_name": "TotalEnergies Marketing Ghana PLC",
+      "sector": "Oil & Gas",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "The Ghanaian downstream arm of the global TotalEnergies group, retailing fuels and lubricants.",
+      "pros": [
+        "Backing and technical standards of a global energy major",
+        "Premium brand positioning and quality-assured products",
+        "Non-fuel retail (shops, services) adds higher-margin income",
+        "Solid dividend history"
+      ],
+      "cons": [
+        "Regulated downstream margins limit pricing power",
+        "Foreign-currency product costs vulnerable to cedi depreciation",
+        "Intense competition from GOIL and other marketers",
+        "Exposed to fuel-demand swings during economic slowdowns"
+      ]
+    },
+    {
+      "symbol": "FML",
+      "company_name": "Fan Milk PLC",
+      "sector": "Consumer Goods",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "A household dairy and frozen-dessert brand, part of the Danone group, with a wide informal distribution network.",
+      "pros": [
+        "Iconic consumer brand with strong recall across Ghana",
+        "Backed by multinational parent (Danone) for R&D and capital",
+        "Extensive last-mile distribution through vendors and agents",
+        "Defensive staple-goods demand"
+      ],
+      "cons": [
+        "Input costs (milk powder, packaging) are import- and FX-sensitive",
+        "Cold-chain logistics are costly and power-dependent",
+        "Thin free float can limit trading liquidity",
+        "Consumer spending squeezed during high inflation"
+      ]
+    },
+    {
+      "symbol": "GGBL",
+      "company_name": "Guinness Ghana Breweries PLC",
+      "sector": "Consumer Goods",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "A leading brewer and beverage producer, part of the Diageo group.",
+      "pros": [
+        "Portfolio of leading beer and malt brands (Guinness, Malta)",
+        "Diageo parentage brings marketing muscle and product innovation",
+        "Local sourcing initiatives reduce some import exposure",
+        "Established nationwide distribution"
+      ],
+      "cons": [
+        "Excise taxes on alcohol directly compress margins",
+        "Raw-material and packaging imports exposed to cedi weakness",
+        "Cyclical demand tied to disposable income",
+        "History of loss-making years during cost spikes"
+      ]
+    },
+    {
+      "symbol": "BOPP",
+      "company_name": "Benso Oil Palm Plantation PLC",
+      "sector": "Consumer Goods",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "An oil-palm plantation and crude palm oil producer with a strong export and dividend record.",
+      "pros": [
+        "Vertically integrated plantation with owned land assets",
+        "Strong historical profitability and generous dividends",
+        "Palm oil demand supported by food and industrial uses",
+        "Export revenue provides some FX earnings"
+      ],
+      "cons": [
+        "Earnings tied to volatile global palm-oil prices",
+        "Agricultural output exposed to weather and disease risk",
+        "Very thin free float - low trading liquidity",
+        "Environmental and land-use scrutiny of palm operations"
+      ]
+    },
+    {
+      "symbol": "UNIL",
+      "company_name": "Unilever Ghana PLC",
+      "sector": "Consumer Goods",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "Maker of leading home-care, personal-care and food brands, part of the global Unilever group.",
+      "pros": [
+        "Diversified portfolio of everyday essential brands",
+        "Global parent provides innovation, supply chain and capital",
+        "Strong distribution and shelf presence",
+        "Brand loyalty across multiple categories"
+      ],
+      "cons": [
+        "Heavy reliance on imported raw materials exposed to FX",
+        "Margins squeezed during periods of high inflation",
+        "Has recorded losses in tough operating years",
+        "Restructuring/brand rationalisation can disrupt revenue"
+      ]
+    },
+    {
+      "symbol": "ACCESS",
+      "company_name": "Access Bank Ghana PLC",
+      "sector": "Financials",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "The Ghanaian subsidiary of Nigeria's Access Bank, expanded through the merger with Ghana's ex-Diamond/Pan-African operations.",
+      "pros": [
+        "Backed by one of Africa's largest banking groups",
+        "Aggressive growth and digital-banking push",
+        "Access to regional trade and corporate networks",
+        "Well-capitalised relative to minimum requirements"
+      ],
+      "cons": [
+        "Government-bond exposure hit by the Domestic Debt Exchange",
+        "Parent-group risk concentrated in Nigeria's economy",
+        "Integration and rebranding costs from acquisitions",
+        "Competitive, margin-pressured banking market"
+      ]
+    },
+    {
+      "symbol": "SCB",
+      "company_name": "Standard Chartered Bank Ghana PLC",
+      "sector": "Financials",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "The Ghanaian arm of the global Standard Chartered group, focused on corporate, institutional and premium retail banking.",
+      "pros": [
+        "Global banking brand with strong risk management",
+        "Leading trade-finance and corporate-banking franchise",
+        "High-quality client base and premium positioning",
+        "Historically strong return on equity and dividends"
+      ],
+      "cons": [
+        "Large government-securities book exposed to sovereign risk",
+        "Narrow retail footprint versus mass-market banks",
+        "Low free float limits share liquidity",
+        "Earnings sensitive to interest-rate and FX cycles"
+      ]
+    },
+    {
+      "symbol": "EGL",
+      "company_name": "Enterprise Group PLC",
+      "sector": "Financials",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "A diversified insurance and financial-services holding company (life, general insurance, pensions, property).",
+      "pros": [
+        "Diversified across life, general insurance and pensions",
+        "Leading brand in Ghana's growing insurance market",
+        "Recurring premium income provides earnings stability",
+        "Structural growth as insurance penetration rises"
+      ],
+      "cons": [
+        "Investment portfolio exposed to bond and equity market swings",
+        "Insurance penetration in Ghana remains low, capping near-term scale",
+        "Claims inflation can pressure underwriting margins",
+        "Regulatory capital requirements tie up funds"
+      ]
+    },
+    {
+      "symbol": "ASG",
+      "company_name": "Asante Gold Corporation",
+      "sector": "Basic Materials",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "A gold mining and exploration company operating Ghanaian assets, cross-listed on multiple exchanges.",
+      "pros": [
+        "Direct exposure to gold - a hedge in uncertain markets",
+        "Producing assets with resource-expansion potential",
+        "Cross-listing broadens its investor base",
+        "Revenue is US-dollar denominated"
+      ],
+      "cons": [
+        "Earnings highly leveraged to volatile gold prices",
+        "Capital-intensive with significant debt/financing needs",
+        "Operational and geological execution risk at mines",
+        "Regulatory, royalty and environmental obligations"
+      ]
+    },
+    {
+      "symbol": "TLW",
+      "company_name": "Tullow Oil PLC",
+      "sector": "Oil & Gas",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "An Africa-focused independent oil producer, operator of Ghana's Jubilee and TEN offshore fields; primary listing in London.",
+      "pros": [
+        "Operator of Ghana's flagship offshore oil fields",
+        "Dollar-denominated production revenue",
+        "Ongoing efforts to cut costs and reduce debt",
+        "Leverage to rising crude-oil prices"
+      ],
+      "cons": [
+        "Carries a large debt load relative to peers",
+        "Earnings swing sharply with global oil prices",
+        "Reserve-depletion and exploration-success risk",
+        "Energy-transition pressures on long-term oil demand"
+      ]
+    },
+    {
+      "symbol": "SIC",
+      "company_name": "SIC Insurance Company PLC",
+      "sector": "Financials",
+      "listing_year": null,
+      "offer_price_ghs": null,
+      "status": "Listed",
+      "summary": "One of Ghana's oldest and largest general-insurance underwriters, with historic state ties.",
+      "pros": [
+        "Long-established brand and wide market presence",
+        "Large share of the general-insurance market",
+        "Benefits from rising demand for compulsory insurance lines",
+        "Low share price offers accessible entry for retail investors"
+      ],
+      "cons": [
+        "Underwriting profitability has been inconsistent",
+        "Legacy receivables and claims-management challenges",
+        "State-linked ownership can slow decision-making",
+        "Investment income exposed to market volatility"
+      ]
+    }
+  ]
+}

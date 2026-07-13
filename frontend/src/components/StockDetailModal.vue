@@ -1,57 +1,44 @@
 <template>
   <Teleport to="body">
-    <div
-      v-if="stock"
-      class="fixed inset-0 z-[60] grid place-items-center p-4"
-      style="background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent)"
-      @click.self="$emit('close')"
-    >
-      <div class="w-full max-w-[440px] flex flex-col gap-3 p-4 bg-surface shadow-lg animate-fadeIn">
-        <div class="flex justify-between items-start">
-          <div class="flex items-center gap-3">
-            <LogoChip :stock="stock" size="40" />
+    <div v-if="stock" class="dialog-backdrop" @click.self="$emit('close')">
+      <div class="dialog" style="width: min(520px, 100%)">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start">
+          <div style="display: flex; align-items: center; gap: var(--space-3)">
+            <StockLogo :symbol="stock.symbol" :name="stock.name" :logo-url="stock.logo_url" :size="40" />
             <div>
-              <div class="font-heading font-extrabold text-xl leading-tight">{{ stock.name }}</div>
-              <span class="text-muted text-xs">{{ stock.sector }}</span>
+              <div class="dialog-title">{{ stock.name }}</div>
+              <span class="text-muted" style="font-size: 12px">{{ stock.company_name }}</span>
             </div>
           </div>
           <button
-            class="bg-transparent border-0 text-lg cursor-pointer text-accent"
+            class="btn-ghost"
+            style="background: none; border: none; font-size: 18px; cursor: pointer; color: var(--color-text)"
             aria-label="Close"
             @click="$emit('close')"
           >
-            &times;
+            ✕
           </button>
         </div>
 
-        <div class="flex justify-between items-baseline">
-          <h2 class="!m-0">{{ formatPrice(stock.price) }}</h2>
-          <span
-            class="font-semibold"
-            :style="{ color: stock.change > 0 ? 'var(--color-positive)' : stock.change < 0 ? 'var(--color-negative)' : 'var(--color-text)' }"
-          >
+        <div style="display: flex; justify-content: space-between; align-items: baseline">
+          <h2 style="margin: 0">{{ formatPrice(stock.price) }}</h2>
+          <span style="font-weight: 600" :style="{ color: changeColor }">
             {{ stock.change > 0 ? "+" : "" }}{{ stock.change.toFixed(2) }}
             ({{ Math.abs((stock.change / stock.price) * 100).toFixed(2) }}%)
           </span>
         </div>
 
+        <div class="text-muted" style="display: flex; justify-content: space-between; font-size: 12px">
+          <span>Price history</span>
+          <span>{{ stock.sector }}</span>
+        </div>
         <StockChart :points="history" />
-        <div class="text-muted text-xs">30-day price history &middot; {{ stock.sector }}</div>
 
-        <div class="flex justify-end gap-2 mt-2">
-          <button
-            class="inline-flex items-center gap-1.5 border px-3 py-1.5 text-[13px] font-heading font-extrabold"
-            :class="isWatched(stock.symbol) ? 'bg-accent-100 border-accent' : 'border-divider'"
-            @click="toggle(stock.symbol)"
-          >
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" @click="toggle(stock.symbol)">
             {{ isWatched(stock.symbol) ? "★ Watching" : "☆ Watch" }}
           </button>
-          <button
-            class="inline-flex items-center justify-center px-3 py-1.5 text-[13px] font-heading font-extrabold bg-accent text-bg"
-            @click="$emit('close')"
-          >
-            Close
-          </button>
+          <button class="btn btn-primary" @click="$emit('close')">Close</button>
         </div>
       </div>
     </div>
@@ -59,9 +46,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import StockChart from "./StockChart.vue";
-import LogoChip from "./LogoChip.vue";
+import StockLogo from "./StockLogo.vue";
 import { fetchSymbolHistory, type HistoryPoint, type MarketData } from "../services/api";
 import { useWatchlist } from "../composables/useWatchlist";
 import { useCurrency } from "../composables/useCurrency";
@@ -73,6 +60,12 @@ const { isWatched, toggle } = useWatchlist();
 const { formatPrice } = useCurrency();
 
 const history = ref<HistoryPoint[]>([]);
+
+const changeColor = computed(() =>
+  props.stock && props.stock.change >= 0
+    ? "var(--color-positive)"
+    : "var(--color-negative)",
+);
 
 watch(
   () => props.stock?.symbol,

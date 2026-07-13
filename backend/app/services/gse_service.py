@@ -38,6 +38,16 @@ class GSEService:
         except Exception:
             return {}
 
+    def _stock_info_for(self, symbol: str) -> Dict[str, Any]:
+        stock_info = self._stocks_info.get(symbol, {})
+        if stock_info:
+            return stock_info
+
+        # stocks.txt may be updated while the dev server is running; reload once
+        # when a live symbol is missing metadata instead of serving stale blanks.
+        self._stocks_info = self._load_stocks_info()
+        return self._stocks_info.get(symbol, {})
+
     async def _fetch_data(self, endpoint: str) -> Optional[Dict[str, Any]]:
         """Make async HTTP request to GSE API"""
         url = f"{self.base_url}{endpoint}"
@@ -92,7 +102,7 @@ class GSEService:
         enriched_data = []
         for stock in data:
             symbol = stock.get("name")
-            stock_info = self._stocks_info.get(symbol, {})
+            stock_info = self._stock_info_for(symbol) if symbol else {}
             stock["symbol"] = symbol or ""
             stock["company_name"] = stock_info.get("company_name", stock.get("name", ""))
             stock["logo_url"] = stock_info.get("logo_url")

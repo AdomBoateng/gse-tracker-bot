@@ -38,6 +38,42 @@ export interface FxRates {
   rates: Record<string, number>;
 }
 
+export interface IpoEntry {
+  symbol: string;
+  company_name: string;
+  sector: string;
+  logo_url?: string | null;
+  listing_year: number | null;
+  offer_price_ghs: number | null;
+  status: string;
+  summary: string;
+  pros: string[];
+  cons: string[];
+}
+
+export interface IpoResponse {
+  disclaimer: string;
+  ipos: IpoEntry[];
+}
+
+export interface NewsArticle {
+  symbol?: string | null;
+  company_name?: string | null;
+  title: string;
+  url: string;
+  published_at: string;
+  source: string;
+  source_type?: string;
+  category?: string;
+  topic: string;
+  summary?: string;
+}
+
+export interface NewsResponse {
+  disclaimer: string;
+  articles: NewsArticle[];
+}
+
 export const fetchLiveData = async (): Promise<MarketData[]> => {
   const response = await axios.get(`${API_BASE}/gse/live`);
   return response.data;
@@ -60,6 +96,16 @@ export const fetchSymbolHistory = async (symbol: string, days = 30): Promise<His
 
 export const fetchFxRates = async (base = "GHS"): Promise<FxRates> => {
   const response = await axios.get(`${API_BASE}/fx/rates`, { params: { base } });
+  return response.data;
+};
+
+export const fetchIpos = async (): Promise<IpoResponse> => {
+  const response = await axios.get(`${API_BASE}/ipos`);
+  return response.data;
+};
+
+export const fetchMarketNews = async (): Promise<NewsResponse> => {
+  const response = await axios.get(`${API_BASE}/news`);
   return response.data;
 };
 

@@ -173,17 +173,42 @@ npm run build
 npm run preview
 ```
 
-## 🚀 Deployment
+## 🚀 Deployment (Render, free tier)
 
-No Docker or production deployment configuration exists in this repo yet (no `Dockerfile`, `docker-compose.yml`, or `deploy.sh`). For now, run in production with Gunicorn directly:
+A `render.yaml` blueprint at the repo root deploys two free services:
+
+- **`gse-tracker-api`** — FastAPI backend (Python web service, root `backend/`), started with
+  `gunicorn -k uvicorn.workers.UvicornWorker app.main:app -b 0.0.0.0:$PORT`.
+- **`gse-tracker-web`** — Vue frontend (static site, root `frontend/`) that **rewrites `/api/*`
+  to the backend**, so the browser calls the API same-origin (no CORS needed).
+
+### Deploy steps
+
+1. Push this repo to GitHub.
+2. In Render: **New → Blueprint**, point it at the repo. Render reads `render.yaml` and creates both services.
+3. Service names become subdomains (`https://<name>.onrender.com`) and must be globally unique.
+   If you rename either service, update the rewrite `destination` and `CORS_ORIGINS` in `render.yaml` to match.
+4. First deploy builds both; the static site's `/api/*` rewrite targets the API service.
+
+### Free-tier caveats
+
+- Services **sleep after ~15 min idle** → 30–60s cold starts.
+- **No persistent disk**: the SQLite DB (`gse_tracker.db`) holding composite history and cached
+  news **resets on each deploy/restart**. Tables auto-create on startup, so the app still runs;
+  for durable history, attach a paid disk or use an external Postgres.
+- The news service scrapes public feeds on a schedule; the **first `/api/v1/news`** call after a
+  cold start can be slow while it warms the cache.
+
+### Local production run (without Render)
 
 ```bash
 cd backend
-pip install gunicorn
-gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000 app.main:app
+pip install -r requirements.txt   # includes gunicorn
+DEBUG=false CORS_ORIGINS="https://your-frontend.example" \
+  gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000 app.main:app
 ```
 
-Set `DEBUG=false` and update `CORS_ORIGINS` to your real domain in `backend/.env` before deploying. Containerization and a documented deployment process are TBD and will be addressed separately when a hosting target is chosen.
+`CORS_ORIGINS` accepts either a comma-separated list or a JSON array.
 
 ## 📚 Configuration
 

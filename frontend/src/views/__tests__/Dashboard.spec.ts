@@ -21,22 +21,34 @@ vi.mock("../../services/api", () => ({
   fetchCompositeHistory: vi.fn().mockResolvedValue([]),
   fetchSymbolHistory: vi.fn().mockResolvedValue([]),
   fetchFxRates: vi.fn().mockResolvedValue({ base: "GHS", date: "2026-07-12", rates: { USD: 0.08 } }),
+  fetchIpos: vi.fn().mockResolvedValue({ disclaimer: "", ipos: [] }),
+  fetchMarketNews: vi.fn().mockResolvedValue({ disclaimer: "", articles: [] }),
   csvExportUrl: "/api/v1/gse/export/csv",
 }));
 
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>();
-  return { ...actual, useRoute: () => ({ query: {} }) };
-});
-
 import Dashboard from "../Dashboard.vue";
 
+// Stub the fetch-on-mount / chart-only children so the smoke test stays focused
+// on the dashboard's own layout, data wiring, and table interactions.
 const mountDashboard = () =>
   mount(Dashboard, {
     global: {
-      stubs: { CompositeChart: true, StockChart: true },
+      stubs: {
+        Sparkline: true,
+        IpoSection: true,
+        NewsSection: true,
+        StockChart: true,
+      },
     },
   });
+
+// Click the "Watchlist" filter button in the table toolbar (a <button>, distinct
+// from the "Watchlist (n)" nav link and the per-row "Toggle watchlist" buttons).
+const clickWatchlistToolbar = (wrapper: ReturnType<typeof mountDashboard>) => {
+  const btn = wrapper.findAll("button").find((b) => b.text().trim() === "Watchlist");
+  if (!btn) throw new Error("Watchlist toolbar button not found");
+  return btn.trigger("click");
+};
 
 describe("Dashboard smoke test", () => {
   beforeEach(() => {
@@ -90,8 +102,8 @@ describe("Dashboard smoke test", () => {
     const wrapper = mountDashboard();
     await flushPromises();
 
-    await wrapper.find('button[aria-label="Add to watchlist"]').trigger("click");
-    await wrapper.find("button.font-heading").trigger("click"); // "Watchlist" toolbar toggle
+    await wrapper.find('button[aria-label="Toggle watchlist"]').trigger("click");
+    await clickWatchlistToolbar(wrapper);
     await flushPromises();
 
     const rows = wrapper.findAll("tbody tr");
@@ -106,6 +118,6 @@ describe("Dashboard smoke test", () => {
     await flushPromises();
 
     // StockDetailModal renders via <Teleport to="body">, outside the wrapper's own subtree
-    expect(document.body.textContent).toContain("30-day price history");
+    expect(document.body.textContent).toContain("Price history");
   });
 });
