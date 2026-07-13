@@ -37,7 +37,6 @@ An informative web application providing real-time Ghana Stock Exchange (GSE) ma
 
 ### Frontend
 - **Framework**: Vue 3 + TypeScript
-- **State Management**: Pinia
 - **Routing**: Vue Router
 - **Styling**: Tailwind CSS
 - **HTTP Client**: Axios
@@ -51,13 +50,10 @@ gse-tracker/
 │   │   ├── api/          # API endpoints
 │   │   │   ├── v1/
 │   │   │   │   └── stocks.py
-│   │   ├── core/         # Configuration, logging
+│   │   ├── core/         # Configuration
 │   │   ├── models/       # Pydantic models
-│   │   ├── services/     # Business logic
-│   │   │   └── gse_service.py
-│   │   └── db/           # Database layer
-│   │       ├── session.py
-│   │       └── crud.py
+│   │   └── services/     # Business logic
+│   │       └── gse_service.py
 │   ├── tests/            # Test suite
 │   ├── requirements.txt
 │   └── main.py
@@ -65,10 +61,7 @@ gse-tracker/
 │   ├── src/
 │   │   ├── views/        # Page components
 │   │   │   └── Dashboard.vue
-│   │   ├── components/
-│   │   ├── stores/
-│   │   ├── services/
-│   │   ├── assets/
+│   │   ├── App.vue
 │   │   └── main.ts
 │   ├── tests/
 │   ├── index.html
@@ -77,8 +70,6 @@ gse-tracker/
 │   └── vite.config.ts
 ├── .env.example
 ├── .gitignore
-├── deploy.sh
-├── docker-compose.yml
 ├── AGENTS.md
 └── README.md
 ```
@@ -140,11 +131,6 @@ pytest tests/ -v
 cd frontend
 npm run test:unit
 
-# Load testing
-cd backend
-npm install -g artillery
-artillery run ../load-test.yml
-
 # Linting
 cd backend
 ruff check .
@@ -187,69 +173,42 @@ npm run build
 npm run preview
 ```
 
-## 🐳 Docker (Optional)
+## 🚀 Deployment (Render, free tier)
 
-### Quick Deploy with Docker Compose
+A `render.yaml` blueprint at the repo root deploys two free services:
 
-```bash
-# Build and start
-docker-compose up -d --build
+- **`gse-tracker-api`** — FastAPI backend (Python web service, root `backend/`), started with
+  `gunicorn -k uvicorn.workers.UvicornWorker app.main:app -b 0.0.0.0:$PORT`.
+- **`gse-tracker-web`** — Vue frontend (static site, root `frontend/`) that **rewrites `/api/*`
+  to the backend**, so the browser calls the API same-origin (no CORS needed).
 
-# View logs
-docker-compose logs -f
+### Deploy steps
 
-# Stop
-docker-compose down
+1. Push this repo to GitHub.
+2. In Render: **New → Blueprint**, point it at the repo. Render reads `render.yaml` and creates both services.
+3. Service names become subdomains (`https://<name>.onrender.com`) and must be globally unique.
+   If you rename either service, update the rewrite `destination` and `CORS_ORIGINS` in `render.yaml` to match.
+4. First deploy builds both; the static site's `/api/*` rewrite targets the API service.
 
-# Stop and remove volumes
-docker-compose down -v
-```
+### Free-tier caveats
 
-### Manual Docker Deployment
+- Services **sleep after ~15 min idle** → 30–60s cold starts.
+- **No persistent disk**: the SQLite DB (`gse_tracker.db`) holding composite history and cached
+  news **resets on each deploy/restart**. Tables auto-create on startup, so the app still runs;
+  for durable history, attach a paid disk or use an external Postgres.
+- The news service scrapes public feeds on a schedule; the **first `/api/v1/news`** call after a
+  cold start can be slow while it warms the cache.
 
-```bash
-# Build images
-docker-compose build
-
-# Start services
-docker-compose up -d
-```
-
-## 🚀 Production Deployment
-
-For production-ready deployment with high concurrency support:
+### Local production run (without Render)
 
 ```bash
-# Using the deployment script
-chmod +x deploy.sh
-./deploy.sh backend/.env.production
-
-# Or manual deployment
 cd backend
-pip install gunicorn
-gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000 app.main:app
+pip install -r requirements.txt   # includes gunicorn
+DEBUG=false CORS_ORIGINS="https://your-frontend.example" \
+  gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000 app.main:app
 ```
 
-### Production Configuration
-
-Copy `.env.production` to `backend/.env` and update:
-
-```env
-DEBUG=false
-CORS_ORIGINS=["http://localhost:5173","https://yourdomain.com"]
-GUNICORN_WORKERS=4
-GUNICORN_TIMEOUT=120
-```
-
-### High Availability Setup
-
-The application is configured to handle:
-- **Concurrent Users**: 1000+ with 4 workers
-- **Response Time**: <200ms average
-- **Auto-recovery**: Docker restart policies
-- **Health Checks**: Built-in monitoring endpoint
-
-See [PRODUCTION.md](PRODUCTION.md) for complete deployment guide.
+`CORS_ORIGINS` accepts either a comma-separated list or a JSON array.
 
 ## 📚 Configuration
 
@@ -261,8 +220,6 @@ OLLAMA_TEMPERATURE=0.3
 
 GSE_API_URL=https://dev.kwayisi.org/apis/gse
 
-DATABASE_URL=sqlite:///./backend/gse_tracker.db
-
 DEBUG=true
 PORT=8000
 
@@ -272,29 +229,18 @@ GUNICORN_WORKERS=4
 GUNICORN_TIMEOUT=120
 ```
 
+`OLLAMA_*` settings are reserved for a planned AI-insights feature and are not used by any endpoint yet.
+
 ### Frontend
 Edit `frontend/vite.config.ts` to configure proxy and other settings.
 
 ## ⚡ Performance
 
-### Current Optimizations
 - **Async/Await**: All API endpoints use async/await with httpx.AsyncClient
-- **Database Pooling**: 20 connections with 10 overflow support
-- **Caching**: 5-minute TTL cache for live data
+- **Caching**: 5-minute in-memory cache for live market data, shared across requests
 - **Worker System**: Gunicorn with multiple Uvicorn workers
 
-### Concurrency Support
-- **100 users**: <50ms response time
-- **500 users**: <100ms response time
-- **1000 users**: <200ms response time
-- **5000 users**: <500ms response time (with 8+ workers)
-
-### Scaling
-- Increase Gunicorn workers: `-w <number>`
-- Adjust Docker resources in `docker-compose.yml`
-- Use connection pooling for database
-
-See [LOAD_TESTING.md](LOAD_TESTING.md) for performance testing guide.
+No load testing has been performed against this app yet — treat any concurrency numbers you see elsewhere in this repo's history as aspirational, not measured.
 
 ## 🤝 Contributing
 
@@ -311,5 +257,5 @@ MIT License - see LICENSE file for details.
 ## 🙏 Acknowledgments
 
 - GSE API by [kwayisi.org](https://dev.kwayisi.org/apis/gse/)
-- Powered by FastAPI, Vue.js, and Ollama
+- Powered by FastAPI and Vue.js
 - Built for Ghana Stock Exchange investors

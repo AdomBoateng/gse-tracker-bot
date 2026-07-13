@@ -1,42 +1,11 @@
+import json
 from pathlib import Path
 from typing import List
 
-from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
-PROJECT_ROOT = BACKEND_DIR.parent
-DEFAULT_DATABASE_PATH = BACKEND_DIR / "gse_tracker.db"
-
-
-def _build_sqlite_url(database_path: Path) -> str:
-    return f"sqlite:///{database_path.resolve().as_posix()}"
-
-
-def _normalize_database_url(database_url: str) -> str:
-    if not database_url.startswith("sqlite") or database_url.endswith(":memory:"):
-        return database_url
-
-    prefix, separator, raw_path = database_url.partition(":///")
-    if not separator or not raw_path:
-        return database_url
-
-    database_path, _, query_string = raw_path.partition("?")
-    path = Path(database_path)
-
-    if path.is_absolute():
-        resolved_path = path
-    elif database_path.startswith("./backend/") or database_path.startswith("backend/"):
-        resolved_path = (PROJECT_ROOT / database_path.removeprefix("./")).resolve()
-    else:
-        resolved_path = (BACKEND_DIR / database_path).resolve()
-
-    normalized_url = f"{prefix}:///{resolved_path.as_posix()}"
-    if query_string:
-        return f"{normalized_url}?{query_string}"
-
-    return normalized_url
 
 
 class Settings(BaseSettings):
@@ -50,8 +19,8 @@ class Settings(BaseSettings):
     # GSE API
     gse_api_url: str = "https://dev.kwayisi.org/apis/gse"
 
-    # Database
-    database_url: str = _build_sqlite_url(DEFAULT_DATABASE_PATH)
+    # Database (daily snapshots for historical charts)
+    database_url: str = "sqlite:///./gse_tracker.db"
 
     # Application
     debug: bool = True
@@ -59,8 +28,23 @@ class Settings(BaseSettings):
     app_name: str = "GSE Tracker API"
     app_version: str = "1.0.0"
 
-    # CORS
-    cors_origins: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    # CORS — stored as a raw string so it accepts either a comma-separated list
+    # (e.g. "https://a.com,https://b.com") or a JSON array from the environment.
+    # pydantic-settings JSON-decodes List[str] env values eagerly and crashes on
+    # a comma list, so we parse it ourselves via cors_origins_list.
+    cors_origins: str = "http://localhost:5173,http://localhost:3000"
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        raw = self.cors_origins.strip()
+        if not raw:
+            return []
+        if raw.startswith("["):
+            try:
+                return [str(o).strip() for o in json.loads(raw)]
+            except json.JSONDecodeError:
+                pass
+        return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
     # Gunicorn (ignored by Pydantic, used directly from .env)
     gunicorn_workers: int = 4
@@ -71,11 +55,6 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",  # Ignore extra environment variables
     )
-
-    @field_validator("database_url", mode="before")
-    @classmethod
-    def normalize_database_url(cls, value: str) -> str:
-        return _normalize_database_url(value)
 
 
 settings = Settings()

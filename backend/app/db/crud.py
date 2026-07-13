@@ -1,99 +1,110 @@
-from app.db.session import Session
-from typing import Optional
-from app.models.portfolio_model import StockHolding
-from app.services.gse_service import gse_service
-from fastapi import HTTPException
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List
+
+from sqlalchemy.orm import Session
+
+from app.models.news_model import NewsItem
+from app.models.snapshot_model import DailySnapshot
 
 
-def get_stock_holding(db: Session, stock_id: int) -> Optional[StockHolding]:
-    """Get stock holding by ID"""
-    return db.query(StockHolding).filter(StockHolding.id == stock_id).first()
-
-
-def get_stock_by_symbol(db: Session, symbol: str) -> Optional[StockHolding]:
-    """Get stock holding by symbol"""
-    return db.query(StockHolding).filter(StockHolding.symbol == symbol).first()
-
-
-def get_all_holdings(db: Session) -> list[StockHolding]:
-    """Get all stock holdings"""
-    return db.query(StockHolding).all()
-
-
-async def create_stock_holding(
-    db: Session, symbol: str, quantity: int, purchase_price: float, purchase_date: str
-) -> StockHolding:
-    """Create a new stock holding"""
-    db_stock = StockHolding(
-        symbol=symbol,
-        quantity=quantity,
-        purchase_price=purchase_price,
-        purchase_date=purchase_date,
+def snapshot_exists_for_date(db: Session, date_str: str) -> bool:
+    """Check whether any snapshot row exists for the given ISO date"""
+    return (
+        db.query(DailySnapshot.id).filter(DailySnapshot.date == date_str).first()
+        is not None
     )
-    db.add(db_stock)
+
+
+def bulk_insert_snapshots(db: Session, date_str: str, rows: List[Dict[str, Any]]) -> None:
+    """Insert one DailySnapshot row per stock for the given date"""
+    db.bulk_save_objects(
+        [
+            DailySnapshot(
+                symbol=row["symbol"],
+                date=date_str,
+                price=row["price"],
+                change=row["change"],
+                volume=row["volume"],
+                market_cap=row.get("market_cap"),
+            )
+            for row in rows
+        ]
+    )
     db.commit()
-    db.refresh(db_stock)
-
-    live_data = await gse_service.get_live_stock(symbol)
-    if live_data:
-        current_price = live_data.price
-        current_value = current_price * quantity
-        cost = purchase_price * quantity
-        profit_loss = current_value - cost
-        profit_loss_percent = (profit_loss / cost * 100) if cost > 0 else 0.0
-
-        db_stock.current_price = current_price
-        db_stock.current_value = current_value
-        db_stock.profit_loss = profit_loss
-        db_stock.profit_loss_percent = profit_loss_percent
-
-        db.commit()
-        db.refresh(db_stock)
-
-    return db_stock
 
 
-def update_stock_holding(
-    db: Session,
-    stock_id: int,
-    quantity: Optional[int] = None,
-    purchase_price: Optional[float] = None,
-    current_price: Optional[float] = None,
-) -> Optional[StockHolding]:
-    """Update stock holding"""
-    db_stock = get_stock_holding(db, stock_id)
-    if not db_stock:
-        raise HTTPException(
-            status_code=404, detail=f"Stock holding {stock_id} not found"
+def get_symbol_history(db: Session, symbol: str, days: int) -> List[DailySnapshot]:
+    """Get up to `days` most recent snapshots for a symbol, oldest first"""
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+    rows = (
+        db.query(DailySnapshot)
+        .filter(DailySnapshot.symbol == symbol, DailySnapshot.date >= cutoff)
+        .order_by(DailySnapshot.date.asc())
+        .all()
+    )
+    return rows
+
+
+def get_snapshots_in_range(db: Session, days: int) -> List[DailySnapshot]:
+    """Get all snapshot rows (all symbols) within the last `days` days, oldest first"""
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+    rows = (
+        db.query(DailySnapshot)
+        .filter(DailySnapshot.date >= cutoff)
+        .order_by(DailySnapshot.date.asc())
+        .all()
+    )
+    return rows
+
+
+def upsert_news_items(db: Session, items: List[Dict[str, Any]]) -> int:
+    """Insert news items by URL hash, updating lightweight metadata on duplicates."""
+    inserted = 0
+    seen_hashes = set()
+    for item in items:
+        url_hash = item["url_hash"]
+        if url_hash in seen_hashes:
+            continue
+        seen_hashes.add(url_hash)
+
+        existing = (
+            db.query(NewsItem)
+            .filter(NewsItem.url_hash == url_hash)
+            .first()
         )
+        if existing:
+            existing.title = item.get("title", existing.title)
+            existing.published_at = item.get("published_at") or existing.published_at
+            existing.summary = item.get("summary") or existing.summary
+            existing.category = item.get("category", existing.category)
+            existing.topic = item.get("topic", existing.topic)
+            continue
 
-    if quantity is not None:
-        db_stock.quantity = quantity
-    if purchase_price is not None:
-        db_stock.purchase_price = purchase_price
-    if (
-        current_price is not None
-        and db_stock.purchase_price is not None
-        and db_stock.quantity is not None
-    ):
-        db_stock.current_price = current_price
-        db_stock.current_value = current_price * db_stock.quantity
-        cost = db_stock.purchase_price * db_stock.quantity
-        db_stock.profit_loss = current_price * db_stock.quantity - cost
-        if cost > 0:
-            db_stock.profit_loss_percent = (db_stock.profit_loss / cost) * 100
+        db.add(NewsItem(**item))
+        inserted += 1
 
     db.commit()
-    db.refresh(db_stock)
-    return db_stock
+    return inserted
 
 
-def delete_stock_holding(db: Session, stock_id: int) -> bool:
-    """Delete stock holding"""
-    db_stock = get_stock_holding(db, stock_id)
-    if not db_stock:
-        return False
+def get_news_items(
+    db: Session,
+    limit: int = 80,
+    symbol: str | None = None,
+    source_type: str | None = None,
+    category: str | None = None,
+) -> List[NewsItem]:
+    """Get latest persisted news, optionally filtered by stock/source/category."""
+    query = db.query(NewsItem)
+    if symbol:
+        query = query.filter(NewsItem.symbol == symbol.upper())
+    if source_type:
+        query = query.filter(NewsItem.source_type == source_type)
+    if category:
+        query = query.filter(NewsItem.category == category)
 
-    db.delete(db_stock)
-    db.commit()
-    return True
+    return (
+        query.order_by(NewsItem.published_at.desc(), NewsItem.discovered_at.desc())
+        .limit(limit)
+        .all()
+    )

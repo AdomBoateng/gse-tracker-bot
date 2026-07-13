@@ -1,0 +1,19 @@
+{
+  "sources": [
+    {
+      "source": "Ghana Stock Exchange",
+      "url": "https://gse.com.gh/news-announcements/",
+      "topic": "Official GSE market announcements"
+    },
+    {
+      "source": "Ghana Stock Exchange",
+      "url": "https://gse.com.gh/news/",
+      "topic": "Official GSE news"
+    },
+    {
+      "source": "Ghana Stock Exchange",
+      "url": "https://gse.com.gh/listed-companies/",
+      "topic": "Listed company disclosures"
+    }
+  ]
+}

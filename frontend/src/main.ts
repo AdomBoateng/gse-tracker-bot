@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import './assets/main.css'
+import './assets/modernist.css'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 
