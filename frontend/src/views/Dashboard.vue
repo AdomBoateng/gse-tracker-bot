@@ -22,7 +22,7 @@
         <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-3)">
           <LayoutToggle v-model="layout" />
           <span class="tag" :style="statusTagStyle">{{ statusLabel }}</span>
-          <select v-model="selectedCurrency" class="input" style="min-height: 32px; width: auto; padding: 4px 8px">
+          <select v-model="selectedCurrency" aria-label="Currency" class="input" style="min-height: 32px; width: auto; padding: 4px 8px">
             <option v-for="c in availableCurrencies" :key="c" :value="c">{{ c }}</option>
           </select>
         </div>
@@ -159,7 +159,7 @@
         </div>
         <div class="field">
           <label>Currency</label>
-          <select v-model="selectedCurrency" class="input">
+          <select v-model="selectedCurrency" aria-label="Currency" class="input">
             <option v-for="c in availableCurrencies" :key="c" :value="c">{{ c }}</option>
           </select>
         </div>
@@ -292,7 +292,7 @@ const searchQuery = ref("");
 const sortDir = ref<"asc" | "desc">("asc");
 const watchlistFilter = ref(false);
 const page = ref(1);
-const pageSize = 8;
+const pageSize = 6;
 
 const toasts = ref<Toast[]>([]);
 const selectedStock = ref<MarketData | null>(null);
