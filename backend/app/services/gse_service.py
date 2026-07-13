@@ -51,16 +51,30 @@ class GSEService:
     async def _fetch_data(self, endpoint: str) -> Optional[Dict[str, Any]]:
         """Make async HTTP request to GSE API"""
         url = f"{self.base_url}{endpoint}"
+        # A browser-like User-Agent and redirect following make the upstream
+        # request work from datacenter hosts (e.g. Render), where the default
+        # httpx client can be redirected or blocked and silently yield no data.
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            ),
+            "Accept": "application/json, text/plain, */*",
+        }
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(follow_redirects=True, headers=headers) as client:
                 response = await client.get(url, timeout=30.0)
                 response.raise_for_status()
                 return response.json()
+        except httpx.HTTPStatusError as e:
+            body = e.response.text[:200] if e.response is not None else ""
+            print(f"Error fetching {url}: HTTP {e.response.status_code} - {body!r}")
+            return None
         except httpx.HTTPError as e:
-            print(f"Error fetching data from {url}: {e}")
+            print(f"Error fetching {url}: {type(e).__name__}: {e}")
             return None
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            print(f"Unexpected error fetching {url}: {type(e).__name__}: {e}")
             return None
 
     async def get_live_data(self) -> list[LiveStock]:
