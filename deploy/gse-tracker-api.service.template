@@ -1,0 +1,20 @@
+# systemd unit for the FastAPI backend (gunicorn + uvicorn workers).
+# setup.sh substitutes __RUN_USER__ and __APP_DIR__ and installs this to
+# /etc/systemd/system/gse-tracker-api.service.
+[Unit]
+Description=GSE Tracker API (gunicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=__RUN_USER__
+WorkingDirectory=__APP_DIR__/backend
+EnvironmentFile=__APP_DIR__/backend/.env
+# One worker: the app starts a background news-refresh task on startup, and a
+# single worker avoids running it (and the scrape) multiple times in parallel.
+ExecStart=__APP_DIR__/backend/.venv/bin/gunicorn -k uvicorn.workers.UvicornWorker app.main:app -b 127.0.0.1:8000 -w 1 --timeout 120
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

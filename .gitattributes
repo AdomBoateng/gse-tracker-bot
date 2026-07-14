@@ -1,0 +1,4 @@
+# Keep shell scripts and server config templates LF so they run correctly on
+# Linux hosts (EC2) regardless of the committer's platform.
+*.sh text eol=lf
+*.template text eol=lf
